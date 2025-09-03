@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinical Calcium Calculator</title>
+    <!-- Tailwind CSS for modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles to enhance Tailwind */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom focus ring for better accessibility and aesthetics */
+        .form-input-custom:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5); /* blue-500 with 50% opacity */
+            border-color: rgb(59 130 246);
+        }
+        /* Style for the disabled input field which shows the result */
+        .calculated-field {
+            background-color: #eef2ff; /* indigo-50 */
+            color: #4338ca; /* indigo-800 */
+            font-weight: 600;
+            border-color: #818cf8; /* indigo-400 */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-2xl bg-white rounded-2xl shadow-lg p-6 md:p-8 space-y-8">
+        
+        <header class="text-center">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Clinical Calcium Calculator</h1>
+            <p class="text-gray-500 mt-1">For medical professional use</p>
+        </header>
+
+        <!-- Error Message Box -->
+        <div id="errorMessage" class="hidden p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50" role="alert">
+            <span class="font-medium">Error:</span> <span id="errorMessageText"></span>
+        </div>
+
+        <!-- Corrected Calcium Calculator -->
+        <section>
+            <h2 class="text-xl font-semibold text-gray-700 border-b pb-2 mb-4">Corrected Calcium (cCa)</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="totalCalcium" class="block text-sm font-medium text-gray-600 mb-1">Total Calcium (mg/dL)</label>
+                    <input type="number" id="totalCalcium" placeholder="e.g., 8.5" class="form-input-custom w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm transition">
+                </div>
+                <div>
+                    <label for="albumin" class="block text-sm font-medium text-gray-600 mb-1">Albumin (g/dL)</label>
+                    <input type="number" id="albumin" placeholder="e.g., 3.0" class="form-input-custom w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm transition">
+                </div>
+            </div>
+            <button onclick="calculateCorrectedCalcium()" class="mt-4 w-full bg-blue-600 text-white font-semibold py-2.5 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200">
+                Calculate cCa
+            </button>
+            <div id="correctedCalciumResult" class="hidden mt-4 text-center p-3 bg-blue-50 border-l-4 border-blue-500 rounded-r-lg">
+                <p class="text-blue-800 font-semibold text-lg"></p>
+            </div>
+        </section>
+
+        <!-- Calcium Infusion Rate Calculator -->
+        <section>
+            <h2 class="text-xl font-semibold text-gray-700 border-b pb-2 mb-4">Calcium Gluconate Infusion</h2>
+            <p class="text-sm text-gray-500 mb-4 -mt-2">Select the value you want to calculate.</p>
+
+            <!-- Unified Infusion Calculation Form -->
+            <div id="infusionCalc" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
+                    <!-- Rate -->
+                    <div>
+                        <div class="flex items-center mb-1">
+                            <input id="target_rate" type="radio" name="calcTarget" value="rate" onchange="autoCalculateInfusion()" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500 cursor-pointer">
+                            <label for="target_rate" class="ml-2 block text-sm font-medium text-gray-600 cursor-pointer">Infusion Rate (mg/kg/hr)</label>
+                        </div>
+                        <input type="number" id="infusion_rate" oninput="autoCalculateInfusion()" placeholder="e.g., 1.5" class="form-input-custom w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm transition">
+                    </div>
+                    <!-- Weight -->
+                    <div>
+                        <div class="flex items-center mb-1">
+                            <input id="target_weight" type="radio" name="calcTarget" value="weight" onchange="autoCalculateInfusion()" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500 cursor-pointer">
+                            <label for="target_weight" class="ml-2 block text-sm font-medium text-gray-600 cursor-pointer">Patient Weight (kg)</label>
+                        </div>
+                        <input type="number" id="infusion_weight" oninput="autoCalculateInfusion()" placeholder="e.g., 70" class="form-input-custom w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm transition">
+                    </div>
+                    <!-- Ca Gluconate -->
+                    <div>
+                        <div class="flex items-center mb-1">
+                           <input id="target_caVolume" type="radio" name="calcTarget" value="caVolume" onchange="autoCalculateInfusion()" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500 cursor-pointer">
+                           <label for="target_caVolume" class="ml-2 block text-sm font-medium text-gray-600 cursor-pointer">10% Ca Gluconate (mL)</label>
+                        </div>
+                        <input type="number" id="infusion_caVolume" oninput="autoCalculateInfusion()" placeholder="e.g., 100" class="form-input-custom w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm transition">
+                    </div>
+                    <!-- IV Fluid -->
+                    <div>
+                        <div class="flex items-center mb-1">
+                            <input id="target_ivVolume" type="radio" name="calcTarget" value="ivVolume" checked onchange="autoCalculateInfusion()" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500 cursor-pointer">
+                            <label for="target_ivVolume" class="ml-2 block text-sm font-medium text-gray-600 cursor-pointer">IV Fluid Volume (mL)</label>
+                        </div>
+                        <input type="number" id="infusion_ivVolume" oninput="autoCalculateInfusion()" placeholder="e.g., 900" class="form-input-custom w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm transition">
+                    </div>
+                    <!-- Drip Rate -->
+                    <div class="md:col-span-2">
+                         <div class="flex items-center mb-1">
+                            <input id="target_dripRate" type="radio" name="calcTarget" value="dripRate" onchange="autoCalculateInfusion()" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500 cursor-pointer">
+                            <label for="target_dripRate" class="ml-2 block text-sm font-medium text-gray-600 cursor-pointer">IV Drip Rate (mL/hr)</label>
+                        </div>
+                        <input type="number" id="infusion_dripRate" oninput="autoCalculateInfusion()" placeholder="e.g., 50" class="form-input-custom w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm transition">
+                    </div>
+                </div>
+            </div>
+            
+        </section>
+
+    </div>
+
+    <script>
+    const ELEMENTAL_CA_IN_GLUCONATE = 9.3; // mg per mL of 10% solution
+    
+    // --- Utility Functions ---
+    const errorMessageDiv = document.getElementById('errorMessage');
+    const errorMessageText = document.getElementById('errorMessageText');
+
+    function showError(message) {
+        errorMessageText.textContent = message;
+        errorMessageDiv.classList.remove('hidden');
+    }
+
+    function hideError() {
+        errorMessageDiv.classList.add('hidden');
+    }
+
+    // --- Corrected Calcium ---
+    function calculateCorrectedCalcium() {
+        hideError();
+        const totalCa = parseFloat(document.getElementById('totalCalcium').value);
+        const albumin = parseFloat(document.getElementById('albumin').value);
+        const resultDiv = document.getElementById('correctedCalciumResult');
+        const resultP = resultDiv.querySelector('p');
+
+        if (isNaN(totalCa) || isNaN(albumin)) {
+            showError("Please enter valid numbers for both Total Calcium and Albumin.");
+            resultDiv.classList.add('hidden');
+            return;
+        }
+
+        const correctedCa = totalCa + (0.8 * (4.0 - albumin));
+        resultP.innerHTML = `Corrected Calcium: <span class="font-bold">${correctedCa.toFixed(2)} mg/dL</span>`;
+        resultDiv.classList.remove('hidden');
+    }
+
+    // --- Infusion Calculations ---
+    const infusionInputs = {
+        rate: document.getElementById('infusion_rate'),
+        weight: document.getElementById('infusion_weight'),
+        caVolume: document.getElementById('infusion_caVolume'),
+        ivVolume: document.getElementById('infusion_ivVolume'),
+        dripRate: document.getElementById('infusion_dripRate')
+    };
+
+    function autoCalculateInfusion() {
+        hideError();
+        const targetKey = document.querySelector('input[name="calcTarget"]:checked').value;
+        let filledValues = {};
+        let requiredFieldsFilled = true;
+
+        // Reset highlights, gather input values, and check if required fields are filled
+        for (const key in infusionInputs) {
+            infusionInputs[key].classList.remove('calculated-field');
+            if (key !== targetKey) {
+                const value = infusionInputs[key].value;
+                if (value === '' || value === null) {
+                    requiredFieldsFilled = false;
+                }
+                filledValues[key] = parseFloat(value);
+            }
+        }
+        
+        // If required fields are not filled, clear the target and stop.
+        if (!requiredFieldsFilled) {
+            infusionInputs[targetKey].value = '';
+            return;
+        }
+
+        const targetInput = infusionInputs[targetKey];
+        
+        // Check for non-numeric input in required fields
+        for (const key in filledValues) {
+            if (isNaN(filledValues[key])) {
+                targetInput.value = ''; // Clear target if any input is invalid
+                return;
+            }
+        }
+
+        let result = NaN;
+
+        try {
+            const { rate, weight, caVolume, ivVolume, dripRate } = filledValues;
+
+            switch (targetKey) {
+                case 'rate':
+                    if (weight <= 0 || (caVolume + ivVolume) <= 0) return;
+                    const totalVolumeRate = caVolume + ivVolume;
+                    const concentration = (caVolume * ELEMENTAL_CA_IN_GLUCONATE) / totalVolumeRate;
+                    const caDelivered = concentration * dripRate;
+                    result = caDelivered / weight;
+                    break;
+                
+                case 'dripRate':
+                    if (weight <= 0 || caVolume <= 0) return;
+                    const totalVolumeDrip = caVolume + ivVolume;
+                    result = (rate * weight * totalVolumeDrip) / (caVolume * ELEMENTAL_CA_IN_GLUCONATE);
+                    break;
+
+                case 'ivVolume':
+                     if (rate <= 0 || weight <= 0 || dripRate <= 0) return;
+                     const numeratorIV = caVolume * ELEMENTAL_CA_IN_GLUCONATE * dripRate;
+                     const denominatorIV = rate * weight;
+                     if (denominatorIV === 0) return;
+                     result = (numeratorIV / denominatorIV) - caVolume;
+                    break;
+
+                case 'caVolume':
+                    if (rate <= 0 || weight <= 0 || dripRate <= 0) return;
+                    const numeratorCa = rate * weight * ivVolume;
+                    const denominatorCa = (ELEMENTAL_CA_IN_GLUCONATE * dripRate) - (rate * weight);
+                    if (denominatorCa <= 0) {
+                         throw new Error("Rate is too high for the given drip rate.");
+                    }
+                    result = numeratorCa / denominatorCa;
+                    break;
+                
+                case 'weight':
+                    if (rate <= 0 || (caVolume + ivVolume) <= 0 || dripRate < 0) return;
+                    const totalVolumeWeight = caVolume + ivVolume;
+                    const concentrationWeight = (caVolume * ELEMENTAL_CA_IN_GLUCONATE) / totalVolumeWeight;
+                    result = (concentrationWeight * dripRate) / rate;
+                    break;
+            }
+
+            if (isNaN(result) || !isFinite(result) || result < 0) {
+                 targetInput.value = ''; // Clear if result is invalid, no error needed
+                 return;
+            }
+            
+            targetInput.value = result.toFixed(2);
+            targetInput.classList.add('calculated-field');
+
+        } catch (error) {
+            showError(error.message);
+            targetInput.value = ''; // Clear target field on error
+        }
+    }
+
+    // Set initial state on page load
+    window.onload = autoCalculateInfusion;
+</script>
+
+</body>
+</html>
+
+
