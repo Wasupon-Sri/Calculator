@@ -1,425 +1,1568 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clinical Calcium Calculator</title>
-    <!-- Tailwind CSS for modern styling -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Personalized Universal Guidance Console</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Inter -->
+    
+    <!-- Google Fonts: Inter and Sarabun -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
     <style>
-        /* Custom styles to enhance Tailwind */
+        /* Base styles from order.html */
         body {
             font-family: 'Inter', sans-serif;
         }
+        #sidebar {
+            transition: transform 0.3s ease-in-out;
+        }
+        .form-input:focus, .form-select:focus {
+             outline: 2px solid transparent;
+             outline-offset: 2px;
+             --tw-ring-color: #3b82f6;
+             box-shadow: 0 0 0 2px var(--tw-ring-color);
+        }
+        #copy-alert {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1050;
+            transition: opacity .5s ease-in-out, transform .5s ease-in-out;
+            transform: translateY(20px);
+        }
+        #content-area::-webkit-scrollbar {
+            display: none;
+        }
+        #content-area {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
 
-        /* Custom focus ring for better accessibility and aesthetics */
-        .form-input-custom:focus {
+        /* Styles from individual calculator files */
+        .form-input-custom:focus, .form-select-custom:focus {
             outline: none;
-            border-color: #22d3ee; /* cyan-400 */
+            border-color: #22d3ee;
             box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.3);
         }
 
-        /* Style for the input field that shows the result */
+        /* Calcium Albumin specific styles */
         .calculated-field {
-            background-color: #164e63; /* cyan-800 */
-            color: #ecfeff; /* cyan-50 */
+            background-color: #164e63;
+            color: #ecfeff;
             font-weight: 600;
-            border-color: #67e8f9; /* cyan-300 */
+            border-color: #67e8f9;
             box-shadow: 0 0 10px rgba(103, 232, 249, 0.4);
         }
 
-        /* Custom scrollbar for a more modern feel */
-        ::-webkit-scrollbar {
-            width: 8px;
+        /* ABG specific styles */
+        .result-card {
+            background-color: #1e293b;
+            border-left: 4px solid #22d3ee;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
         }
-        ::-webkit-scrollbar-track {
-            background: #1e293b; /* slate-800 */
+        .result-card h4 {
+            color: #67e8f9;
+            font-weight: 600;
         }
-        ::-webkit-scrollbar-thumb {
-            background: #475569; /* slate-600 */
-            border-radius: 10px;
+        .result-card .formula {
+            font-family: monospace;
+            background-color: #334155;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            color: #cbd5e1;
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            white-space: pre-wrap;
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #64748b; /* slate-500 */
+
+        /* Calsulin specific styles */
+        .calsulin-body {
+             font-family: 'Sarabun', 'Inter', sans-serif;
+             background-color: #f4f7f9;
         }
+        .tab-button {
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+        .tab-button.active {
+            color: #2563eb;
+            border-bottom-color: #2563eb;
+        }
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .calculator-card {
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.07), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s ease-in-out;
+        }
+        .calculation-box {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+        .disclaimer {
+            font-style: italic;
+            font-size: 0.875rem;
+            color: #6b7280;
+            border-left: 4px solid #f87171;
+            padding-left: 1rem;
+            margin-top: 2rem;
+        }
+        .input-error {
+            border-color: #ef4444;
+            box-shadow: 0 0 0 2px #fecaca;
+        }
+        .radio-label-correction input:checked + .radio-custom-correction {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+        }
+        
+        /* Nutrition specific styles */
+        .nutrition-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .nutrition-container input.example, .nutrition-container textarea.example { 
+            color: #999999; 
+        }
+
     </style>
 </head>
-<body class="bg-slate-900 flex items-center justify-center min-h-screen p-4 text-slate-300">
+<body class="bg-gray-100 text-gray-800">
 
-    <div class="w-full max-w-2xl bg-slate-800 rounded-2xl shadow-2xl shadow-cyan-500/10 border border-slate-700 p-6 md:p-8 space-y-8">
-        
-        <header class="text-center flex flex-col items-center gap-2">
-            <!-- High-tech icon -->
-            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-cyan-400">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                <path d="m12 14-4-2 4-2 4 2-4 2z"></path>
-                <path d="M12 22V12"></path>
-                <path d="M8 12v-2"></path>
-                <path d="M16 12v-2"></path>
-            </svg>
-            <h1 class="text-2xl md:text-3xl font-bold text-slate-100">Clinical Calcium Calculator</h1>
-            <p class="text-slate-400 mt-1 text-sm">For medical professional use</p>
-        </header>
-
-        <!-- Error Message Box -->
-        <div id="errorMessage" class="hidden p-4 text-sm text-red-400 rounded-lg bg-red-900/40 border border-red-500/50" role="alert">
-            <span class="font-bold">Error:</span> <span id="errorMessageText"></span>
-        </div>
-
-        <!-- Corrected Calcium Calculator -->
-        <section class="space-y-4">
-            <h2 class="text-lg font-semibold text-cyan-400 border-b border-slate-700 pb-2">Corrected Calcium (cCa)</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label for="totalCalcium" class="block text-sm font-medium text-slate-400 mb-1">Total Calcium (mg/dL)</label>
-                    <input type="number" id="totalCalcium" placeholder="e.g., 8.5" class="form-input-custom w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md shadow-sm transition text-white">
-                </div>
-                <div>
-                    <label for="albumin" class="block text-sm font-medium text-slate-400 mb-1">Albumin (g/dL)</label>
-                    <input type="number" id="albumin" placeholder="e.g., 3.0" class="form-input-custom w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md shadow-sm transition text-white">
-                </div>
+    <div class="flex h-screen bg-white">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="fixed z-30 inset-y-0 left-0 w-64 bg-gray-900 text-gray-200 flex-col transform -translate-x-full md:relative md:translate-x-0">
+            <div class="flex items-center justify-center p-6 border-b border-gray-700">
+                <i class="ph-bold ph-first-aid-kit text-blue-400 text-3xl"></i>
+                <h1 class="text-xl font-bold ml-3 tracking-tight">Clinical Console</h1>
             </div>
-            <button onclick="calculateCorrectedCalcium()" class="w-full bg-cyan-600 text-white font-semibold py-2.5 px-4 rounded-md hover:bg-cyan-700 focus:outline-none focus:ring-4 focus:ring-cyan-500/50 transition-all duration-200 shadow-lg shadow-cyan-600/20">
-                Calculate cCa
-            </button>
-            <div id="correctedCalciumResult" class="hidden mt-4 text-center p-3 bg-slate-700/50 border-l-4 border-cyan-500 rounded-r-lg">
-                <p class="text-cyan-300 font-semibold text-lg"></p>
+            <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+                <a href="#" class="nav-link flex items-center px-4 py-2.5 rounded-lg hover:bg-gray-700 transition-colors" data-target="orders">
+                    <i class="ph-bold ph-pill text-lg"></i>
+                    <span class="ml-4">ICU Orders</span>
+                </a>
+                 <a href="#" class="nav-link flex items-center px-4 py-2.5 rounded-lg hover:bg-gray-700 transition-colors" data-target="abg">
+                    <i class="ph-bold ph-test-tube text-lg"></i>
+                    <span class="ml-4">ABG Analysis</span>
+                </a>
+                 <a href="#" class="nav-link flex items-center px-4 py-2.5 rounded-lg hover:bg-gray-700 transition-colors" data-target="betablocker">
+                    <i class="ph-bold ph-heartbeat text-lg"></i>
+                    <span class="ml-4">Beta-Blocker Equiv.</span>
+                </a>
+                 <a href="#" class="nav-link flex items-center px-4 py-2.5 rounded-lg hover:bg-gray-700 transition-colors" data-target="calcium">
+                    <i class="ph-bold ph-atom text-lg"></i>
+                    <span class="ml-4">Calcium Calculator</span>
+                </a>
+                 <a href="#" class="nav-link flex items-center px-4 py-2.5 rounded-lg hover:bg-gray-700 transition-colors" data-target="calsulin">
+                    <i class="ph-bold ph-drop text-lg"></i>
+                    <span class="ml-4">Insulin Dosing</span>
+                </a>
+                 <a href="#" class="nav-link flex items-center px-4 py-2.5 rounded-lg hover:bg-gray-700 transition-colors" data-target="nutrition">
+                    <i class="ph-bold ph-bowl-food text-lg"></i>
+                    <span class="ml-4">Nutrition Consult</span>
+                </a>
+                 <a href="#" class="nav-link flex items-center px-4 py-2.5 rounded-lg hover:bg-gray-700 transition-colors" data-target="steroid">
+                    <i class="ph-bold ph-shield text-lg"></i>
+                    <span class="ml-4">Steroid Conversion</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Overlay for mobile -->
+        <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden md:hidden"></div>
+
+        <!-- Main Content -->
+        <main class="flex-1 flex flex-col overflow-hidden">
+            <header class="flex items-center justify-between p-4 bg-white border-b border-gray-200">
+                <button id="sidebar-toggle" class="md:hidden text-gray-600 hover:text-gray-900">
+                    <i class="ph-bold ph-list text-2xl"></i>
+                </button>
+                <h2 id="page-title" class="text-2xl font-bold text-gray-900"></h2>
+            </header>
+
+            <div id="content-area" class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-4 sm:p-6 lg:p-8">
+                
+                <!-- Page 1: Original ICU Orders -->
+                <div id="orders" class="content-page">
+                    <!-- This content is from order.html -->
+                    <div id="sedation" class="mb-8">
+                        <h3 class="text-xl font-semibold mb-4">Sedation & Analgesia</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+                            <!-- Card: Midazolam -->
+                            <div class="bg-white p-5 rounded-lg border border-gray-200 shadow-sm flex flex-col"><h5 class="text-lg font-semibold text-gray-900 mb-4">Midazolam</h5><div class="mb-3"><label for="midazolam-concentration" class="block text-sm font-medium text-gray-500 mb-1">Concentration (ratio)</label><input id="midazolam-concentration" class="form-input block w-full rounded-md border-gray-300 shadow-sm" value="2:1" /></div><div class="mb-4"><label for="midazolam-rate" class="block text-sm font-medium text-gray-500 mb-1">IV Rate (mL/hr)</label><input id="midazolam-rate" class="form-input block w-full rounded-md border-gray-300 shadow-sm" value="5" /></div><button class="copy-btn mt-auto w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center" data-id="midazolam"><i class="ph ph-copy mr-2"></i>Copy Order</button></div>
+                            <!-- Card: Propofol -->
+                            <div class="bg-white p-5 rounded-lg border border-gray-200 shadow-sm flex flex-col"><h5 class="text-lg font-semibold text-gray-900 mb-4">1% Propofol</h5><div class="mb-3"><label for="propofol-concentration" class="block text-sm font-medium text-gray-500 mb-1">Concentration (ratio)</label><input id="propofol-concentration" class="form-input block w-full rounded-md border-gray-300 shadow-sm" value="10:1" /></div><div class="mb-4"><label for="propofol-rate" class="block text-sm font-medium text-gray-500 mb-1">IV Rate (mL/hr)</label><input id="propofol-rate" class="form-input block w-full rounded-md border-gray-300 shadow-sm" value="5" /></div><button class="copy-btn mt-auto w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center" data-id="propofol"><i class="ph ph-copy mr-2"></i>Copy Order</button></div>
+                            <!-- Card: Dexmedetomidine -->
+                            <div class="bg-white p-5 rounded-lg border border-gray-200 shadow-sm flex flex-col"><h5 class="text-lg font-semibold text-gray-900 mb-4">Dexmedetomidine</h5><div class="mb-3"><label for="dexmed-concentration" class="block text-sm font-medium text-gray-500 mb-1">Concentration (ratio)</label><input id="dexmed-concentration" class="form-input block w-full rounded-md border-gray-300 shadow-sm" value="4:1" /></div><div class="mb-4"><label for="dexmed-rate" class="block text-sm font-medium text-gray-500 mb-1">IV Rate (mL/hr)</label><input id="dexmed-rate" class="form-input block w-full rounded-md border-gray-300 shadow-sm" value="10" /></div><button class="copy-btn mt-auto w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center" data-id="dexmed"><i class="ph ph-copy mr-2"></i>Copy Order</button></div>
+                            <!-- Card: Fentanyl -->
+                            <div class="bg-white p-5 rounded-lg border border-gray-200 shadow-sm flex flex-col"><h5 class="text-lg font-semibold text-gray-900 mb-4">Fentanyl</h5><div class="mb-3"><label class="block text-sm font-medium text-gray-500 mb-1">Concentration (ratio)</label><div class="w-full"><button type="button" class="w-full bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg" disabled>10:1</button></div></div><div class="mb-4"><label for="fentanyl-rate" class="block text-sm font-medium text-gray-500 mb-1">IV Rate (mL/hr)</label><input id="fentanyl-rate" class="form-input block w-full rounded-md border-gray-300 shadow-sm" value="5" /></div><button class="copy-btn mt-auto w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center" data-id="fentanyl"><i class="ph ph-copy mr-2"></i>Copy Order</button></div>
+                        </div>
+                    </div>
+                    <div id="ventilation" class="mb-8">
+                        <h3 class="text-xl font-semibold mb-4">Mechanical Ventilation</h3>
+                        <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-sm max-w-2xl mx-auto">
+                            <h5 class="text-xl font-semibold text-gray-900 mb-4">Ventilator Settings</h5>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div><label for="vent-mode" class="block text-sm font-medium text-gray-700 mb-1">Mode</label><select id="vent-mode" class="form-select block w-full rounded-md border-gray-300 shadow-sm"><option>VCV</option><option>PCV</option><option>SIMV</option><option>PSV</option></select></div>
+                                <div class="vt-field"><label for="vent-VT" class="block text-sm font-medium text-gray-700 mb-1">VT (mL)</label><input id="vent-VT" class="form-input block w-full rounded-md border-gray-300 shadow-sm" value="450" /></div>
+                                <div class="ip-field"><label for="vent-IP" class="block text-sm font-medium text-gray-700 mb-1">IP (cmH₂O)</label><input id="vent-IP" class="form-input block w-full rounded-md border-gray-300 shadow-sm" value="20" /></div>
+                                <div class="ps-field"><label for="vent-PS" class="block text-sm font-medium text-gray-700 mb-1">PS (cmH₂O)</label><input id="vent-PS" class="form-input block w-full rounded-md border-gray-300 shadow-sm" value="10" /></div>
+                                <div class="rr-field"><label for="vent-RR" class="block text-sm font-medium text-gray-700 mb-1">RR (breaths/min)</label><input id="vent-RR" class="form-input block w-full rounded-md border-gray-300 shadow-sm" value="20" /></div>
+                                <div><label for="vent-Ti" class="block text-sm font-medium text-gray-700 mb-1">Ti (s)</label><input id="vent-Ti" class="form-input block w-full rounded-md border-gray-300 shadow-sm" value="1.0" /></div>
+                                <div><label for="vent-FT" class="block text-sm font-medium text-gray-700 mb-1">FT (L/min)</label><input id="vent-FT" class="form-input block w-full rounded-md border-gray-300 shadow-sm" value="2" /></div>
+                                <div><label for="vent-PEEP" class="block text-sm font-medium text-gray-700 mb-1">PEEP (cmH₂O)</label><input id="vent-PEEP" class="form-input block w-full rounded-md border-gray-300 shadow-sm" value="5" /></div>
+                                <div><label for="vent-FiO2" class="block text-sm font-medium text-gray-700 mb-1">FiO₂</label><input id="vent-FiO2" class="form-input block w-full rounded-md border-gray-300 shadow-sm" value="0.4" /></div>
+                            </div>
+                            <button class="copy-btn mt-6 w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center" data-id="vent"><i class="ph ph-copy mr-2"></i>Copy Ventilator Order</button>
+                        </div>
+                    </div>
+                    <div id="vasopressors" class="mb-8">
+                        <h3 class="text-xl font-semibold mb-4">Vasopressors</h3>
+                        <div class="mb-6 max-w-xs"><label for="vasopressors-weight" class="block text-base font-semibold text-gray-800 mb-2">Patient Body Weight (kg)</label><input id="vasopressors-weight" type="number" min="0" step="0.1" class="form-input block w-full rounded-md border-gray-300 shadow-sm" placeholder="e.g. 70" /></div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+                            <div class="bg-white p-5 rounded-lg border border-gray-200 shadow-sm flex flex-col"><h5 class="text-lg font-semibold text-gray-900 mb-4">Norepinephrine</h5><div class="mb-3"><label class="block text-sm font-medium text-gray-500 mb-1">Concentration (mg:mL)</label><div class="grid grid-cols-2 gap-2 norepi-btn-group"> <button type="button" class="preset-btn border border-gray-300 text-gray-700 font-semibold py-2 px-2 rounded-lg hover:bg-gray-100 transition-colors" data-ratio="4:250">4:250</button><button type="button" class="preset-btn border border-gray-300 text-gray-700 font-semibold py-2 px-2 rounded-lg hover:bg-gray-100 transition-colors" data-ratio="4:100">4:100</button><button type="button" class="preset-btn border border-gray-300 text-gray-700 font-semibold py-2 px-2 rounded-lg hover:bg-gray-100 transition-colors" data-ratio="8:100">8:100</button><button type="button" class="preset-btn border border-gray-300 text-gray-700 font-semibold py-2 px-2 rounded-lg hover:bg-gray-100 transition-colors" data-ratio="16:100">16:100</button></div></div><div class="mb-3"><label for="norepi-rate" class="block text-sm font-medium text-gray-500 mb-1">IV Rate (mL/hr)</label><input id="norepi-rate" class="form-input block w-full rounded-md border-gray-300 shadow-sm" placeholder="20" /></div><div class="mb-4"><label for="norepi-titrate" class="block text-sm font-medium text-gray-500 mb-1">Titration</label><div class="flex items-center text-sm"><input id="norepi-titrate" type="text" class="form-input w-16 rounded-md border-gray-300 shadow-sm mr-2" value="1-2" /><span class="text-gray-600">ml/hr for MAP ≥ 65</span></div></div><button class="copy-btn mt-auto w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center" data-id="norepi"><i class="ph ph-copy mr-2"></i>Copy Order</button></div>
+                            <div class="bg-white p-5 rounded-lg border border-gray-200 shadow-sm flex flex-col"><h5 class="text-lg font-semibold text-gray-900 mb-4">Epinephrine</h5><div class="mb-3"><label class="block text-sm font-medium text-gray-500 mb-1">Concentration (mg:mL)</label><div class="epi-btn-group"><button type="button" class="preset-btn w-full border border-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-100 transition-colors" data-ratio="1:10">1:10</button></div></div><div class="mb-3"><label for="epi-rate" class="block text-sm font-medium text-gray-500 mb-1">IV Rate (mL/hr)</label><input id="epi-rate" class="form-input block w-full rounded-md border-gray-300 shadow-sm" placeholder="10" /></div><div class="mb-4"><label for="epi-titrate" class="block text-sm font-medium text-gray-500 mb-1">Titration</label><div class="flex items-center text-sm"><input id="epi-titrate" type="text" class="form-input w-16 rounded-md border-gray-300 shadow-sm mr-2" value="1-2" /><span class="text-gray-600">ml/hr for MAP ≥ 65</span></div></div><button class="copy-btn mt-auto w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center" data-id="epi"><i class="ph ph-copy mr-2"></i>Copy Order</button></div>
+                            <div class="bg-white p-5 rounded-lg border border-gray-200 shadow-sm flex flex-col"><h5 class="text-lg font-semibold text-gray-900 mb-4">Dopamine</h5><div class="mb-3"><label class="block text-sm font-medium text-gray-500 mb-1">Concentration (mg:mL)</label><div class="dopamine-btn-group"><button type="button" class="preset-btn w-full border border-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-100 transition-colors" data-ratio="2:1">2:1</button></div></div><div class="mb-3"><label for="dopamine-rate" class="block text-sm font-medium text-gray-500 mb-1">IV Rate (mL/hr)</label><input id="dopamine-rate" class="form-input block w-full rounded-md border-gray-300 shadow-sm" placeholder="15" /></div><div class="flex-grow"></div><button class="copy-btn mt-auto w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center" data-id="dopamine"><i class="ph ph-copy mr-2"></i>Copy Order</button></div>
+                            <div class="bg-white p-5 rounded-lg border border-gray-200 shadow-sm flex flex-col"><h5 class="text-lg font-semibold text-gray-900 mb-4">Dobutamine</h5><div class="mb-3"><label class="block text-sm font-medium text-gray-500 mb-1">Concentration (mg:mL)</label><div class="dobutamine-btn-group"><button type="button" class="preset-btn w-full border border-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-100 transition-colors" data-ratio="2:1">2:1</button></div></div><div class="mb-3"><label for="dobutamine-rate" class="block text-sm font-medium text-gray-500 mb-1">IV Rate (mL/hr)</label><input id="dobutamine-rate" class="form-input block w-full rounded-md border-gray-300 shadow-sm" placeholder="10" /></div><div class="flex-grow"></div><button class="copy-btn mt-auto w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center" data-id="dobutamine"><i class="ph ph-copy mr-2"></i>Copy Order</button></div>
+                        </div>
+                    </div>
+                    <div id="dietary" class="mb-8">
+                        <h3 class="text-xl font-semibold mb-4">Enteral Nutrition</h3>
+                        <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-sm max-w-md mx-auto">
+                            <h5 class="text-xl font-semibold text-gray-900 mb-4">BD Feed Order</h5>
+                            <div class="space-y-4">
+                                <div><label for="bd_feed-concentration" class="block text-sm font-medium text-gray-700 mb-1">Concentration (ratio)</label><input id="bd_feed-concentration" class="form-input block w-full rounded-md border-gray-300 shadow-sm" /></div>
+                                <div><label for="bd_feed-volume" class="block text-sm font-medium text-gray-700 mb-1">Volume (mL)</label><input id="bd_feed-volume" class="form-input block w-full rounded-md border-gray-300 shadow-sm" /></div>
+                                <div><label for="bd_feed-frequency" class="block text-sm font-medium text-gray-700 mb-1">Feeds/day</label><input id="bd_feed-frequency" class="form-input block w-full rounded-md border-gray-300 shadow-sm" value="4" /></div>
+                                <div><label for="bd_feed-flush" class="block text-sm font-medium text-gray-700 mb-1">Flush Vol (mL)</label><input id="bd_feed-flush" class="form-input block w-full rounded-md border-gray-300 shadow-sm" /></div>
+                            </div>
+                            <button class="copy-btn mt-6 w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center" data-id="bd_feed"><i class="ph ph-copy mr-2"></i>Copy Feed Order</button>
+                        </div>
+                    </div>
+                    <div id="antibiotics" class="mb-8">
+                        <h3 class="text-xl font-semibold mb-4">Renal Dosing & Antibiotics</h3>
+                         <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                            <div class="lg:col-span-2">
+                                <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-sm h-full">
+                                    <h5 class="text-xl font-semibold text-gray-900 mb-2">CrCl Calculator</h5>
+                                    <p class="text-sm text-gray-500 mb-4">Cockcroft-Gault Formula</p>
+                                    <div class="space-y-4">
+                                        <div><label for="crcl-age" class="block text-sm font-medium text-gray-700 mb-1">Age (years)</label><input id="crcl-age" type="number" class="form-input block w-full rounded-md border-gray-300 shadow-sm" placeholder="e.g., 65"></div>
+                                        <div><label for="crcl-weight" class="block text-sm font-medium text-gray-700 mb-1">Weight (kg)</label><input id="crcl-weight" type="number" step="0.1" class="form-input block w-full rounded-md border-gray-300 shadow-sm" placeholder="e.g., 70"></div>
+                                        <div><label for="crcl-creatinine" class="block text-sm font-medium text-gray-700 mb-1">Serum Creatinine (mg/dL)</label><input id="crcl-creatinine" type="number" step="0.1" class="form-input block w-full rounded-md border-gray-300 shadow-sm" placeholder="e.g., 1.2"></div>
+                                        <div><label for="crcl-sex" class="block text-sm font-medium text-gray-700 mb-1">Sex</label><select id="crcl-sex" class="form-select block w-full rounded-md border-gray-300 shadow-sm"><option value="male">Male</option><option value="female">Female</option></select></div>
+                                    </div>
+                                    <button id="calculate-crcl-btn" class="mt-6 w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">Calculate CrCl</button>
+                                    <div id="crcl-result" class="mt-4 text-center text-3xl font-bold text-blue-600 h-10"></div>
+                                </div>
+                            </div>
+                            <div class="lg:col-span-3">
+                                <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-sm h-full">
+                                    <h5 class="text-xl font-semibold text-gray-900 mb-4">Antibiotic Dosing Guide</h5>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div><label for="atb-select" class="block text-sm font-medium text-gray-700 mb-1">Antibiotic</label><select id="atb-select" class="form-select block w-full rounded-md border-gray-300 shadow-sm"><option selected disabled>Select an Antibiotic...</option><option value="Meropenem">Meropenem</option><option value="Piperacillin/Tazobactam">Piperacillin/Tazobactam</option><option value="Levofloxacin">Levofloxacin</option><option value="Ceftazidime">Ceftazidime</option><option value="Imipenem/Cilastatin">Imipenem/Cilastatin</option><option value="IV Fosfomycin">IV Fosfomycin</option><option value="Colistin">Colistin</option></select></div>
+                                        <div><label for="atb-dose-tier" class="block text-sm font-medium text-gray-700 mb-1">Dose Tier / Indication</label><select id="atb-dose-tier" class="form-select block w-full rounded-md border-gray-300 shadow-sm"></select></div>
+                                        <div id="pathogen-container" class="hidden"><label for="atb-pathogen" class="block text-sm font-medium text-gray-700 mb-1">Pathogen</label><select id="atb-pathogen" class="form-select block w-full rounded-md border-gray-300 shadow-sm"></select></div>
+                                        <div><label for="atb-crcl" class="block text-sm font-medium text-gray-700 mb-1">CrCl (mL/min)</label><input id="atb-crcl" type="number" class="form-input block w-full rounded-md border-gray-300 shadow-sm bg-gray-100" placeholder="Calculate on left" readonly></div>
+                                        <div class="md:col-span-2"><label for="atb-rrt" class="block text-sm font-medium text-gray-700 mb-1">RRT Modality</label><select id="atb-rrt" class="form-select block w-full rounded-md border-gray-300 shadow-sm"><option value="none" selected>None</option><option value="IHD">Hemodialysis (IHD)</option><option value="PD">Peritoneal Dialysis (PD)</option><option value="CRRT_II">CRRT (Intermittent Infusion)</option><option value="CRRT_CI">CRRT (Continuous Infusion)</option><option value="PIRRT_SLED">PIRRT / SLED</option></select></div>
+                                    </div>
+                                    <div class="mt-6 flex flex-col sm:flex-row gap-3">
+                                        <button id="calculate-atb-dose-btn" class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">Calculate Maintenance Dose</button>
+                                        <button id="show-loading-dose-btn" class="w-full bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors">Show Loading Dose</button>
+                                    </div>
+                                    <div id="atb-dose-result" class="mt-4 p-4 bg-blue-50 rounded-lg text-center text-lg font-semibold text-blue-800 min-h-[5.5rem] flex items-center justify-center"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="antibiotics-table" class="mb-8">
+                         <h3 class="text-xl font-semibold mb-4">Antibiotic Reference Table</h3>
+                        <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
+                            <table class="min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="whitespace-nowrap px-4 py-3 font-semibold text-left text-gray-900">Antibiotic</th>
+                                        <th class="whitespace-nowrap px-4 py-3 font-semibold text-left text-gray-900">Indication / Dose Tier</th>
+                                        <th class="whitespace-nowrap px-4 py-3 font-semibold text-left text-gray-900">Loading Dose</th>
+                                        <th class="whitespace-nowrap px-4 py-3 font-semibold text-left text-gray-900">CrCl (mL/min) or RRT Modality</th>
+                                        <th class="whitespace-nowrap px-4 py-3 font-semibold text-left text-gray-900">Adjusted Maintenance Dose & Regimen</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200" id="atb-reference-tbody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Page 2: ABG Calculator -->
+                <div id="abg" class="content-page hidden">
+                    <!-- This content is from ABG.html -->
+                    <div class="w-full max-w-3xl mx-auto bg-slate-800 rounded-2xl shadow-2xl shadow-cyan-500/10 border border-slate-700 p-6 md:p-8 space-y-8 text-slate-300">
+                        <header class="text-center flex flex-col items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-cyan-400"><path d="M4 18.21a3.78 3.78 0 0 1 .42-1.61l1.59-2.76a3.78 3.78 0 0 1 1.61-.42l2.76-1.59a3.78 3.78 0 0 1 1.61.42l2.76 1.59a3.78 3.78 0 0 1 .42 1.61l-1.59 2.76a3.78 3.78 0 0 1-1.61.42l-2.76 1.59a3.78 3.78 0 0 1-1.61-.42Z"></path><path d="m10 14 4 4"></path><path d="M12 2v4"></path><path d="m4.93 4.93 2.83 2.83"></path><path d="M2 12h4"></path><path d="m4.93 19.07 2.83-2.83"></path><path d="M12 22v-4"></path><path d="m19.07 19.07-2.83-2.83"></path><path d="M22 12h-4"></path><path d="m19.07 4.93-2.83 2.83"></path></svg>
+                            <h1 class="text-2xl md:text-3xl font-bold text-slate-100">ABG Analysis Calculator</h1>
+                            <p class="text-slate-400 mt-1 text-sm">Comprehensive Acid-Base Evaluation</p>
+                        </header>
+                        <div id="abgErrorMessage" class="hidden p-4 text-sm text-red-400 rounded-lg bg-red-900/40 border border-red-500/50" role="alert">
+                            <span class="font-bold">Error:</span> <span id="abgErrorMessageText"></span>
+                        </div>
+                        <section class="space-y-4">
+                            <h2 class="text-lg font-semibold text-cyan-400 border-b border-slate-700 pb-2">Patient Data</h2>
+                            <p class="text-sm text-slate-500 -mt-1">pH, PaCO₂, and HCO₃⁻ are required. Na⁺, Cl⁻, and Albumin are for Anion Gap analysis.</p>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+                                <div><label for="ph" class="block text-sm font-medium text-slate-400 mb-1">pH <span class="text-red-400">*</span></label><input type="number" id="ph" step="0.01" placeholder="e.g., 7.25" class="form-input-custom w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md shadow-sm transition text-white"></div>
+                                <div><label for="paco2" class="block text-sm font-medium text-slate-400 mb-1">PaCO₂ (mmHg) <span class="text-red-400">*</span></label><input type="number" id="paco2" placeholder="e.g., 25" class="form-input-custom w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md shadow-sm transition text-white"></div>
+                                <div><label for="hco3" class="block text-sm font-medium text-slate-400 mb-1">HCO₃⁻ (mEq/L) <span class="text-red-400">*</span></label><input type="number" id="hco3" placeholder="e.g., 12" class="form-input-custom w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md shadow-sm transition text-white"></div>
+                                <div><label for="na" class="block text-sm font-medium text-slate-400 mb-1">Na⁺ (mEq/L) <span class="text-slate-500">(Optional)</span></label><input type="number" id="na" placeholder="e.g., 140" class="form-input-custom w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md shadow-sm transition text-white"></div>
+                                <div><label for="cl" class="block text-sm font-medium text-slate-400 mb-1">Cl⁻ (mEq/L) <span class="text-slate-500">(Optional)</span></label><input type="number" id="cl" placeholder="e.g., 100" class="form-input-custom w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md shadow-sm transition text-white"></div>
+                                <div><label for="albumin" class="block text-sm font-medium text-slate-400 mb-1">Albumin (g/dL) <span class="text-slate-500">(Optional)</span></label><input type="number" id="albumin" step="0.1" placeholder="e.g., 4.0" class="form-input-custom w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md shadow-sm transition text-white"></div>
+                            </div>
+                            <div id="respiratoryTiming" class="hidden pt-4">
+                                <h3 class="text-md font-semibold text-slate-300 mb-2">Respiratory Disorder Timing</h3>
+                                <div class="flex items-center space-x-4 bg-slate-700/50 p-3 rounded-md">
+                                    <p class="text-sm font-medium text-slate-400">Select timing:</p>
+                                    <div class="flex items-center"><input id="acute" name="timing" type="radio" value="acute" class="h-4 w-4 text-cyan-600 bg-slate-600 border-slate-500 focus:ring-cyan-500"><label for="acute" class="ml-2 block text-sm text-slate-300">Acute</label></div>
+                                    <div class="flex items-center"><input id="chronic" name="timing" type="radio" value="chronic" class="h-4 w-4 text-cyan-600 bg-slate-600 border-slate-500 focus:ring-cyan-500"><label for="chronic" class="ml-2 block text-sm text-slate-300">Chronic (>72 hrs)</label></div>
+                                </div>
+                            </div>
+                            <button onclick="analyzeABG()" class="w-full mt-4 bg-cyan-600 text-white font-semibold py-2.5 px-4 rounded-md hover:bg-cyan-700 focus:outline-none focus:ring-4 focus:ring-cyan-500/50 transition-all duration-200 shadow-lg shadow-cyan-600/20">Analyze ABG</button>
+                        </section>
+                        <div id="abgResultsSection" class="hidden space-y-6 pt-4">
+                            <h2 class="text-xl font-bold text-slate-100 border-b border-slate-700 pb-2">Analysis Results</h2>
+                            <div id="primaryDisorderResult"></div>
+                            <div id="anionGapResult"></div>
+                            <div id="compensationResult"></div>
+                            <div id="finalSummary" class="p-4 bg-cyan-900/40 border border-cyan-500/50 rounded-lg">
+                                <h3 class="font-bold text-lg text-cyan-300">Final Interpretation</h3>
+                                <p id="summaryText" class="mt-1 text-slate-200"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Page 3: Beta-Blocker Calculator -->
+                <div id="betablocker" class="content-page hidden">
+                    <!-- This content is from Beta blocker.html -->
+                     <div class="w-full max-w-3xl mx-auto bg-slate-800 rounded-2xl shadow-2xl shadow-cyan-500/10 border border-slate-700 p-6 md:p-8 space-y-12 text-slate-300">
+                        <section>
+                            <header class="text-center flex flex-col items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-cyan-400"><path d="M4.5 12.5a8 8 0 0 1 8-8 .5.5 0 0 1 0 1a7 7 0 0 0-7 7 .5.5 0 0 1-1 0Z"></path><path d="M19.5 12.5a8 8 0 0 0-8-8 .5.5 0 0 0 0 1a7 7 0 0 1 7 7 .5.5 0 0 0 1 0Z"></path></svg>
+                                <h1 class="text-2xl md:text-3xl font-bold text-slate-100">Beta-Blocker Equivalence Calculator</h1>
+                                <p class="text-slate-400 mt-1 text-sm max-w-xl">Estimate equivalent daily doses based on beta-1 blockade. This is a clinical guide and not a substitute for clinical judgment.</p>
+                            </header>
+                            <div id="bbErrorMessage" class="hidden p-4 mt-6 text-sm text-red-400 rounded-lg bg-red-900/40 border border-red-500/50" role="alert">
+                                <span class="font-bold">Error:</span> <span id="bbErrorMessageText"></span>
+                            </div>
+                            <div class="mt-6 space-y-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="bb_drug" class="block text-sm font-medium text-slate-400 mb-1">Convert From</label>
+                                        <select id="bb_drug" class="form-select-custom w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md shadow-sm transition text-white">
+                                            <option value="atenolol">Atenolol</option>
+                                            <option value="bisoprolol">Bisoprolol</option>
+                                            <option value="carvedilol">Carvedilol</option>
+                                            <option value="metoprolol_t" selected>Metoprolol Tartrate</option>
+                                            <option value="metoprolol_s">Metoprolol Succinate (ER)</option>
+                                            <option value="nebivolol">Nebivolol</option>
+                                            <option value="propranolol">Propranolol</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="bb_dose" class="block text-sm font-medium text-slate-400 mb-1">Total Daily Dose (mg)</label>
+                                        <input type="number" id="bb_dose" placeholder="e.g., 100" class="form-input-custom w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md shadow-sm transition text-white">
+                                    </div>
+                                </div>
+                                <button onclick="calculateBetaBlockerEquivalence()" class="w-full mt-4 bg-cyan-600 text-white font-semibold py-2.5 px-4 rounded-md hover:bg-cyan-700 focus:outline-none focus:ring-4 focus:ring-cyan-500/50 transition-all duration-200 shadow-lg shadow-cyan-600/20">Calculate</button>
+                            </div>
+                            <div id="bbResultsSection" class="hidden space-y-4 pt-6">
+                                <h2 class="text-xl font-bold text-slate-100 border-b border-slate-700 pb-2">Equivalent Daily Doses</h2>
+                                <div id="bbResultsList" class="space-y-2"></div>
+                            </div>
+                        </section>
+                        <section>
+                            <header class="text-center flex flex-col items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-cyan-400"><path d="M12 20.94c1.5 0 2.75 1.06 4 1.55 1.25.5 2.5.5 3.5-.5.84-.84.98-2.22.5-3.5-1-2.5-2.5-4-2.5-4s1.5-1.5 2.5-4c.48-1.28.34-2.66-.5-3.5-.98-1-2.25-1-3.5-.5C14.75 3.94 13.5 5 12 5s-2.75-1.06-4-1.55C6.75 2.95 5.5 2.95 4.5 3.95c-.84.84-.98 2.22-.5 3.5 1 2.5 2.5 4 2.5 4S5 13 4 15.5c-.48 1.28-.34 2.66.5 3.5.98 1 2.25 1 3.5.5 1.25-.5 2.5-1.55 4-1.55z"></path></svg>
+                                <h1 class="text-2xl md:text-3xl font-bold text-slate-100">Guideline-Directed Beta-Blocker Dosing for HFrEF</h1>
+                                <p class="text-slate-400 mt-1 text-sm max-w-xl">Dosing for the three beta-blockers with proven mortality benefit in Heart Failure with reduced Ejection Fraction.</p>
+                            </header>
+                            <div class="overflow-x-auto mt-6">
+                                <table class="min-w-full divide-y divide-slate-700">
+                                    <thead class="bg-slate-900/50">
+                                        <tr>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-cyan-400 uppercase tracking-wider">Beta-Blocker</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-cyan-400 uppercase tracking-wider">Starting Dose</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-cyan-400 uppercase tracking-wider">Target Dose</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-slate-800 divide-y divide-slate-700">
+                                        <tr class="hover:bg-slate-700/50 transition-colors"><td class="px-6 py-4 whitespace-nowrap"><div class="text-sm font-medium text-slate-100">Bisoprolol</div></td><td class="px-6 py-4 whitespace-nowrap"><div class="text-sm text-slate-300">1.25 mg once daily</div></td><td class="px-6 py-4 whitespace-nowrap"><div class="text-sm text-slate-300">10 mg once daily</div></td></tr>
+                                        <tr class="hover:bg-slate-700/50 transition-colors"><td class="px-6 py-4 whitespace-nowrap"><div class="text-sm font-medium text-slate-100">Carvedilol</div></td><td class="px-6 py-4 whitespace-nowrap"><div class="text-sm text-slate-300">3.125 mg twice daily</div></td><td class="px-6 py-4 whitespace-nowrap"><div class="text-sm text-slate-300">25 mg twice daily</div><div class="text-xs text-slate-400">(50 mg twice daily if weight > 85 kg)</div></td></tr>
+                                        <tr class="hover:bg-slate-700/50 transition-colors"><td class="px-6 py-4 whitespace-nowrap"><div class="text-sm font-medium text-slate-100">Metoprolol Succinate (ER)</div></td><td class="px-6 py-4 whitespace-nowrap"><div class="text-sm text-slate-300">12.5 - 25 mg once daily</div></td><td class="px-6 py-4 whitespace-nowrap"><div class="text-sm text-slate-300">200 mg once daily</div></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="text-center text-xs text-slate-500 pt-4 mt-4">
+                                <p><strong>Note:</strong> Doses should be initiated at the starting dose and titrated up (e.g., doubled) every 2 weeks as tolerated by the patient's heart rate and blood pressure, until the target dose is reached or the maximum tolerated dose is achieved.</p>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+
+                <!-- Page 4: Calcium Albumin Calculator -->
+                <div id="calcium" class="content-page hidden">
+                    <!-- This content is from Calcium Albumin.html -->
+                     <div class="w-full max-w-2xl mx-auto bg-slate-800 rounded-2xl shadow-2xl shadow-cyan-500/10 border border-slate-700 p-6 md:p-8 space-y-8 text-slate-300">
+                        <header class="text-center flex flex-col items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-cyan-400"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m12 14-4-2 4-2 4 2-4 2z"></path><path d="M12 22V12"></path><path d="M8 12v-2"></path><path d="M16 12v-2"></path></svg>
+                            <h1 class="text-2xl md:text-3xl font-bold text-slate-100">Clinical Calcium Calculator</h1>
+                            <p class="text-slate-400 mt-1 text-sm">For medical professional use</p>
+                        </header>
+                        <div id="caErrorMessage" class="hidden p-4 text-sm text-red-400 rounded-lg bg-red-900/40 border border-red-500/50" role="alert">
+                            <span class="font-bold">Error:</span> <span id="caErrorMessageText"></span>
+                        </div>
+                        <section class="space-y-4">
+                            <h2 class="text-lg font-semibold text-cyan-400 border-b border-slate-700 pb-2">Corrected Calcium (cCa)</h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div><label for="totalCalcium" class="block text-sm font-medium text-slate-400 mb-1">Total Calcium (mg/dL)</label><input type="number" id="totalCalcium" placeholder="e.g., 8.5" class="form-input-custom w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md shadow-sm transition text-white"></div>
+                                <div><label for="albumin_ca" class="block text-sm font-medium text-slate-400 mb-1">Albumin (g/dL)</label><input type="number" id="albumin_ca" placeholder="e.g., 3.0" class="form-input-custom w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md shadow-sm transition text-white"></div>
+                            </div>
+                            <button onclick="calculateCorrectedCalcium()" class="w-full bg-cyan-600 text-white font-semibold py-2.5 px-4 rounded-md hover:bg-cyan-700 focus:outline-none focus:ring-4 focus:ring-cyan-500/50 transition-all duration-200 shadow-lg shadow-cyan-600/20">Calculate cCa</button>
+                            <div id="correctedCalciumResult" class="hidden mt-4 text-center p-3 bg-slate-700/50 border-l-4 border-cyan-500 rounded-r-lg"><p class="text-cyan-300 font-semibold text-lg"></p></div>
+                        </section>
+                        <section class="space-y-4">
+                            <h2 class="text-lg font-semibold text-cyan-400 border-b border-slate-700 pb-2">Calcium Gluconate Infusion</h2>
+                            <p class="text-sm text-slate-500 mb-4 -mt-2">Fill all other fields, then click "Calc" for the one you need.</p>
+                            <div id="infusionCalc" class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                                <div><div class="flex items-center justify-between mb-1"><label for="infusion_rate" class="text-sm font-medium text-slate-400">Infusion Rate (mg/kg/hr)</label><button onclick="calculateInfusion('rate')" class="bg-slate-700 hover:bg-slate-600 text-cyan-400 text-xs font-semibold py-1 px-3 rounded-full transition-colors">Calc</button></div><input type="number" id="infusion_rate" placeholder="e.g., 1.5" class="form-input-custom w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md shadow-sm transition text-white"></div>
+                                <div><div class="flex items-center justify-between mb-1"><label for="infusion_weight" class="text-sm font-medium text-slate-400">Patient Weight (kg)</label><button onclick="calculateInfusion('weight')" class="bg-slate-700 hover:bg-slate-600 text-cyan-400 text-xs font-semibold py-1 px-3 rounded-full transition-colors">Calc</button></div><input type="number" id="infusion_weight" placeholder="e.g., 70" class="form-input-custom w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md shadow-sm transition text-white"></div>
+                                <div><div class="flex items-center justify-between mb-1"><label for="infusion_caVolume" class="text-sm font-medium text-slate-400">10% Ca Gluconate (mL)</label><button onclick="calculateInfusion('caVolume')" class="bg-slate-700 hover:bg-slate-600 text-cyan-400 text-xs font-semibold py-1 px-3 rounded-full transition-colors">Calc</button></div><input type="number" id="infusion_caVolume" class="form-input-custom w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md shadow-sm transition text-white" placeholder="e.g., 100"></div>
+                                <div><div class="flex items-center justify-between mb-1"><label for="infusion_ivVolume" class="text-sm font-medium text-slate-400">Diluent Volume (mL)</label><button onclick="calculateInfusion('ivVolume')" class="bg-slate-700 hover:bg-slate-600 text-cyan-400 text-xs font-semibold py-1 px-3 rounded-full transition-colors">Calc</button></div><input type="number" id="infusion_ivVolume" placeholder="e.g., 900" class="form-input-custom w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md shadow-sm transition text-white"></div>
+                                <div><div class="flex items-center justify-between mb-1"><label for="infusion_totalVolume" class="text-sm font-medium text-slate-400">Total Fluid Volume (mL)</label></div><input type="number" id="infusion_totalVolume" placeholder="Auto-calculated" class="form-input-custom w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md shadow-sm transition text-white"></div>
+                                <div><div class="flex items-center justify-between mb-1"><label for="infusion_dripRate" class="text-sm font-medium text-slate-400">IV Drip Rate (mL/hr)</label><button onclick="calculateInfusion('dripRate')" class="bg-slate-700 hover:bg-slate-600 text-cyan-400 text-xs font-semibold py-1 px-3 rounded-full transition-colors">Calc</button></div><input type="number" id="infusion_dripRate" placeholder="e.g., 50" class="form-input-custom w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md shadow-sm transition text-white"></div>
+                            </div>
+                        </section>
+                        <div class="text-center pt-2"><button id="toggleDurationBtn" onclick="toggleDurationSection()" class="text-sm text-cyan-500 hover:text-cyan-400 font-medium transition">Show Infusion Duration Calculator</button></div>
+                        <section id="durationSection" class="hidden transition-all duration-500">
+                            <h2 class="text-lg font-semibold text-cyan-400 border-b border-slate-700 pb-2 mb-4">Infusion Duration</h2>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                                <div><div class="flex items-center justify-between mb-1"><label for="duration_totalVolume" class="text-sm font-medium text-slate-400">Total Volume (mL)</label><button onclick="calculateDuration('totalVolume')" class="bg-slate-700 hover:bg-slate-600 text-cyan-400 text-xs font-semibold py-1 px-3 rounded-full transition-colors">Calc</button></div><input type="number" id="duration_totalVolume" class="form-input-custom w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md shadow-sm transition text-white" placeholder="Value from above"></div>
+                                <div><div class="flex items-center justify-between mb-1"><label for="duration_dripRate" class="text-sm font-medium text-slate-400">Drip Rate (mL/hr)</label><button onclick="calculateDuration('dripRate')" class="bg-slate-700 hover:bg-slate-600 text-cyan-400 text-xs font-semibold py-1 px-3 rounded-full transition-colors">Calc</button></div><input type="number" id="duration_dripRate" class="form-input-custom w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md shadow-sm transition text-white" placeholder="Value from above"></div>
+                                <div><div class="flex items-center justify-between mb-1"><label for="duration_time" class="text-sm font-medium text-slate-400">Time (hours)</label><button onclick="calculateDuration('time')" class="bg-slate-700 hover:bg-slate-600 text-cyan-400 text-xs font-semibold py-1 px-3 rounded-full transition-colors">Calc</button></div><input type="number" id="duration_time" class="form-input-custom w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md shadow-sm transition text-white" placeholder="e.g., 20"></div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+                
+                <!-- Page 5: Calsulin Calculator -->
+                <div id="calsulin" class="content-page hidden">
+                    <!-- This content is from Calsulin.html -->
+                    <div class="w-full max-w-6xl mx-auto calsulin-body text-gray-800">
+                        <header class="text-center mb-8">
+                            <h1 class="text-4xl font-bold text-blue-700">In-Patient Insulin Dosing Tool</h1>
+                            <p class="text-gray-600 mt-2 text-lg">Initial Dosing, Titration, and Correction.</p>
+                        </header>
+                        <div class="mb-6 flex flex-wrap justify-center border-b border-gray-200">
+                            <button id="calsulin-step1-btn" onclick="showCalsulinTab('step1')" class="tab-button active text-lg font-semibold py-3 px-6 sm:px-8">Step 1: Initial Dose</button>
+                            <button id="calsulin-step2-btn" onclick="showCalsulinTab('step2')" class="tab-button text-lg font-semibold py-3 px-6 sm:px-8">Step 2: Titration Order</button>
+                            <button id="calsulin-step3-btn" onclick="showCalsulinTab('step3')" class="tab-button text-lg font-semibold py-3 px-6 sm:px-8">Step 3: Correction Dose</button>
+                        </div>
+                        <div>
+                            <div id="calsulin-step1" class="tab-content active">
+                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                    <div class="bg-white p-6 md:p-8 rounded-xl calculator-card">
+                                        <h2 class="text-2xl font-semibold mb-6 border-b pb-4 text-gray-800">1. Patient & Dose Information</h2>
+                                        <div class="mb-5"><label class="block text-md font-medium text-gray-700 mb-2">TDD Calculation Method</label><div class="flex space-x-2 bg-gray-100 p-1 rounded-lg"><label class="flex-1 text-center px-3 py-2 rounded-md cursor-pointer text-sm font-medium transition has-[:checked]:bg-white has-[:checked]:shadow-md"><input type="radio" name="tddMethod" value="calculate" class="sr-only"> Calculate from BW</label><label class="flex-1 text-center px-3 py-2 rounded-md cursor-pointer text-sm font-medium transition has-[:checked]:bg-white has-[:checked]:shadow-md"><input type="radio" name="tddMethod" value="manual" class="sr-only" checked> Enter TDD Manually</label></div></div>
+                                        <div id="calculationInputs"><div class="mb-5"><label for="bodyWeight" class="block text-md font-medium text-gray-700 mb-2">Body Weight (kg)</label><input type="number" id="bodyWeight" class="w-full px-4 py-2 text-lg border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition" placeholder="e.g., 60"></div><div class="mb-5"><label class="block text-md font-medium text-gray-700 mb-2">Total Daily Dose (TDD) Unit</label><div class="flex space-x-2 bg-gray-100 p-1 rounded-lg"><label class="flex-1 text-center px-2 py-2 rounded-md cursor-pointer font-medium transition has-[:checked]:bg-blue-600 has-[:checked]:text-white"><input type="radio" name="tddUnit" value="0.4" class="sr-only"> 0.4 U/kg</label><label class="flex-1 text-center px-2 py-2 rounded-md cursor-pointer font-medium transition has-[:checked]:bg-blue-600 has-[:checked]:text-white"><input type="radio" name="tddUnit" value="0.5" class="sr-only" checked> 0.5 U/kg</label><label class="flex-1 text-center px-2 py-2 rounded-md cursor-pointer font-medium transition has-[:checked]:bg-blue-600 has-[:checked]:text-white"><input type="radio" name="tddUnit" value="0.6" class="sr-only"> 0.6 U/kg</label></div></div></div>
+                                        <div id="manualTddInput" class="hidden mb-5"><label for="manualTdd" class="block text-md font-medium text-gray-700 mb-2">Total Daily Dose (TDD)</label><input type="number" id="manualTdd" class="w-full px-4 py-2 text-lg border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition" placeholder="e.g., 30"></div>
+                                        <div><label class="block text-md font-medium text-gray-700 mb-2">Insulin Regimen</label><div class="space-y-3"><label class="flex items-center p-4 border rounded-lg cursor-pointer has-[:checked]:bg-blue-50 has-[:checked]:border-blue-500 transition"><input type="radio" name="feedingFrequency" value="3meals" class="h-5 w-5 text-blue-600"><span class="ml-3 font-medium">3 Meals/Day (Self-eating) - RI + NPH</span></label><label class="flex items-center p-4 border rounded-lg cursor-pointer has-[:checked]:bg-blue-50 has-[:checked]:border-blue-500 transition"><input type="radio" name="feedingFrequency" value="4meals" class="h-5 w-5 text-blue-600"><span class="ml-3 font-medium">4 Feeds/Day (Tube-feeding) - RI + NPH</span></label><label class="flex items-center p-4 border rounded-lg cursor-pointer has-[:checked]:bg-blue-50 has-[:checked]:border-blue-500 transition"><input type="radio" name="feedingFrequency" value="premixed" class="h-5 w-5 text-blue-600"><span class="ml-3 font-medium">Premixed (e.g., 70/30) - 2 injections/day</span></label></div></div>
+                                    </div>
+                                    <div class="bg-white p-6 md:p-8 rounded-xl calculator-card flex flex-col">
+                                        <div id="calsulin-resultsContent" class="hidden flex-grow"><h2 class="text-2xl font-semibold mb-6 border-b pb-4 text-gray-800">2. Calculated Insulin Regimen</h2><div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 text-center"><div class="bg-blue-50 p-4 rounded-lg"><p class="text-sm text-blue-800 font-medium">Total Daily Dose</p><p id="tddResult" class="text-3xl font-bold text-blue-900">- U</p></div><div class="bg-green-50 p-4 rounded-lg"><p class="text-sm text-green-800 font-medium">Total Bolus</p><p id="bolusResult" class="text-3xl font-bold text-green-900">- U</p></div><div class="bg-yellow-50 p-4 rounded-lg"><p class="text-sm text-yellow-800 font-medium">Total Basal</p><p id="basalResult" class="text-3xl font-bold text-yellow-900">- U</p></div></div><div class="mb-6"><h3 class="font-semibold mb-3 text-gray-700">Daily Schedule:</h3><div class="overflow-x-auto border rounded-lg"><table class="min-w-full"><thead class="bg-gray-50"><tr><th class="p-3 text-left text-sm font-semibold">Time</th><th class="p-3 text-left text-sm font-semibold">Insulin Type</th><th class="p-3 text-left text-sm font-semibold">Dose (Units)</th></tr></thead><tbody id="scheduleBody" class="divide-y divide-gray-200"></tbody></table></div></div><div class="mb-6"><h3 class="font-semibold mb-3 text-gray-700">Calculation Breakdown:</h3><div id="calculationText" class="calculation-box text-sm text-gray-600"></div></div><button id="proceedButton" onclick="proceedToStep2()" class="mt-auto w-full bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 transition-colors shadow-lg text-lg">Use these doses in Step 2 →</button></div>
+                                        <div id="noSelectionMessage" class="flex items-center justify-center h-full text-center text-gray-500"><p class="text-lg">Please enter patient data and select a regimen to see the calculation.</p></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="calsulin-step2" class="tab-content">
+                               <div class="bg-white p-6 md:p-8 rounded-xl calculator-card grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                   <div><h2 class="text-2xl font-semibold mb-6 border-b pb-4 text-gray-800">1. Baseline Doses for Titration</h2><div class="mb-5"><label class="block font-medium mb-2">Regimen Type</label><select id="regimenType" class="w-full p-3 border rounded-lg bg-gray-50 text-md"><option value="basalBolus">Basal-Bolus</option><option value="premixed">Premixed (70/30)</option></select></div><div id="basalBolusInputs"><div class="mb-5"><label class="block font-medium mb-2">Feeding Schedule</label><div class="flex space-x-6"><label class="flex items-center font-medium"><input type="radio" name="feedingSchedule" value="3" checked class="h-5 w-5 text-blue-600 mr-2"> 3 Meals</label><label class="flex items-center font-medium"><input type="radio" name="feedingSchedule" value="4" class="h-5 w-5 text-blue-600 mr-2"> 4 Feeds</label></div></div><div class="grid grid-cols-3 gap-4 mb-4 items-end"><div class="col-span-2"><label for="basalType" class="text-md font-medium">Basal Insulin</label><select id="basalType" class="w-full mt-1 p-3 border rounded-lg bg-gray-50"><option>Biosulin N</option><option>Semglee</option><option>Glargine</option></select></div><div><label for="basalDose" id="basalDoseLabel" class="text-md font-medium">Dose (U)</label><input type="number" id="basalDose" placeholder="12" class="w-full mt-1 p-3 border rounded-lg text-lg transition"></div></div><div class="grid grid-cols-3 gap-4 items-end"><div class="col-span-2"><label for="bolusType" class="text-md font-medium">Bolus Insulin</label><select id="bolusType" class="w-full mt-1 p-3 border rounded-lg bg-gray-50"><option>RI</option><option>Novorapid</option></select></div><div><label for="bolusDose" class="text-md font-medium">Dose (U)</label><input type="number" id="bolusDose" placeholder="8" class="w-full mt-1 p-3 border rounded-lg text-lg transition"></div></div></div><div id="premixedInputs" class="hidden"><input type="hidden" id="premixedType" value="Biosulin (70/30)"><div class="grid grid-cols-2 gap-4 items-end"><div><label for="premixedMorningDose" class="text-md font-medium">Morning Dose (U)</label><input type="number" id="premixedMorningDose" placeholder="14" class="w-full mt-1 p-3 border rounded-lg text-lg transition"></div><div><label for="premixedEveningDose" class="text-md font-medium">Evening Dose (U)</label><input type="number" id="premixedEveningDose" placeholder="6" class="w-full mt-1 p-3 border rounded-lg text-lg transition"></div></div></div><div id="validation-message" class="text-red-600 font-medium mt-4 h-5"></div><button onclick="generateOrder()" class="mt-4 w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors shadow-lg text-lg">Generate / Update Order</button></div>
+                                   <div class="h-full flex flex-col"><h2 class="text-2xl font-semibold mb-6 border-b pb-4 text-gray-800">2. Generated Titration Order</h2><div id="orderOutput" class="calculation-box text-gray-500 flex-grow flex items-center justify-center text-center text-md">Your generated order will appear here.</div><button class="copy-button hidden mt-4 w-full bg-teal-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-teal-700 transition-colors shadow-lg text-lg" id="copyButton" onclick="copyOrderText()">Copy Order Text</button><div class="copy-feedback text-center text-teal-600 font-semibold h-6 mt-2" id="copyFeedback"></div></div>
+                               </div>
+                            </div>
+                            <div id="calsulin-step3" class="tab-content">
+                                <div class="bg-white p-6 md:p-8 rounded-xl calculator-card grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+                                    <div class="space-y-4"><h2 class="text-2xl font-semibold mb-2 border-b pb-4 text-gray-800">1. Patient & Glucose Data</h2><div><label for="tddCorrection" class="block text-sm font-medium text-gray-700 mb-1">Total Daily Dose (TDD) of Insulin (units)</label><div class="flex items-center space-x-2"><input type="number" id="tddCorrection" class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500" placeholder="e.g., 50"><button onclick="useCalculatedTDD()" class="flex-shrink-0 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-3 px-3 rounded-lg text-sm transition-colors">Use TDD from Step 1</button></div></div><div><label for="current-bg" class="block text-sm font-medium text-gray-700 mb-1">Current Blood Glucose (mg/dL)</label><input type="number" id="current-bg" class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500" placeholder="e.g., 250"></div><div><label for="target-bg" class="block text-sm font-medium text-gray-700 mb-1">Target Blood Glucose (mg/dL)</label><input type="number" id="target-bg" value="150" class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500"></div><div><label class="block text-sm font-medium text-gray-700 mb-2">Select Insulin Sensitivity Factor (ISF) Rule</label><div class="grid grid-cols-1 sm:grid-cols-3 gap-3"><label class="radio-label-correction cursor-pointer"><input type="radio" name="isf-rule" value="1800" class="sr-only" checked><div class="radio-custom-correction w-full p-3 border-2 border-gray-300 rounded-lg text-center bg-white hover:border-blue-400 transition-all duration-200"><span class="text-gray-800 font-semibold">1800 Rule</span><p class="text-xs text-gray-500">Rapid-Acting Analogs</p></div></label><label class="radio-label-correction cursor-pointer"><input type="radio" name="isf-rule" value="1700" class="sr-only"><div class="radio-custom-correction w-full p-3 border-2 border-gray-300 rounded-lg text-center bg-white hover:border-blue-400 transition-all duration-200"><span class="text-gray-800 font-semibold">1700 Rule</span><p class="text-xs text-gray-500">Rapid-Acting (Conservative)</p></div></label><label class="radio-label-correction cursor-pointer"><input type="radio" name="isf-rule" value="1500" class="sr-only"><div class="radio-custom-correction w-full p-3 border-2 border-gray-300 rounded-lg text-center bg-white hover:border-blue-400 transition-all duration-200"><span class="text-gray-800 font-semibold">1500 Rule</span><p class="text-xs text-gray-500">Regular Insulin</p></div></label></div></div><button id="calculate-correction-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-300">Calculate Correction Dose</button><div id="calsulin-error-message" class="text-red-500 text-sm mt-2 text-center h-5"></div></div>
+                                    <div id="calsulin-results-container" class="bg-blue-50 p-5 rounded-lg border-l-4 border-blue-500 flex flex-col"><h2 class="text-xl font-bold text-gray-800 mb-4">2. Calculation Breakdown</h2><div id="results-content-correction" class="space-y-4 flex-grow flex flex-col justify-center"><p class="text-center text-gray-500">Results will be displayed here.</p></div></div>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="disclaimer"><strong>Disclaimer:</strong> This tool is intended for educational purposes for healthcare professionals and is not a substitute for professional medical advice. All calculations should be verified, and clinical judgment must be applied based on the individual patient's condition.</p>
+                    </div>
+                </div>
+
+                <!-- Page 6: Nutrition Note Generator -->
+                <div id="nutrition" class="content-page hidden">
+                    <!-- This content is from nutrition.html -->
+                     <div class="nutrition-container">
+                        <h1>Nutrition Consult Note Generator</h1>
+                        <div id="nutrition-form-container"></div>
+                        <div class="buttons text-center mt-6">
+                            <button id="nutritionGenerateBtn" type="button" class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">Generate Note</button>
+                            <button id="nutritionCopyBtn" type="button" class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">Copy to Clipboard</button>
+                            <button id="nutritionSaveBtn" type="button" class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">Save as .txt</button>
+                        </div>
+                        <h2 class="text-xl font-semibold mt-6">Generated Note:</h2>
+                        <textarea id="nutritionOutput" readonly class="w-full h-96 p-2 border border-gray-300 rounded-md bg-white"></textarea>
+                    </div>
+                </div>
+                
+                <!-- Page 7: Steroid Converter -->
+                <div id="steroid" class="content-page hidden">
+                     <!-- This content is from Steroid dose conversion.html -->
+                     <div class="w-full max-w-3xl mx-auto bg-slate-800 rounded-2xl shadow-2xl shadow-cyan-500/10 border border-slate-700 p-6 md:p-8 space-y-12 text-slate-300">
+                        <section>
+                            <header class="text-center flex flex-col items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-cyan-400"><path d="M10.5 20.5 2.5 12.5 12.5 2.5 21.5 11.5 13.5 19.5Z"></path><path d="m2.5 12.5 10 10"></path><path d="m13.5 19.5 8-8"></path></svg>
+                                <h1 class="text-2xl md:text-3xl font-bold text-slate-100">Corticosteroid Equivalence Calculator</h1>
+                                <p class="text-slate-400 mt-1 text-sm max-w-xl">Calculate equivalent anti-inflammatory doses for common corticosteroids. Intended for clinical guidance only.</p>
+                            </header>
+                            <div id="steroidErrorMessage" class="hidden p-4 mt-6 text-sm text-red-400 rounded-lg bg-red-900/40 border border-red-500/50" role="alert">
+                                <span class="font-bold">Error:</span> <span id="steroidErrorMessageText"></span>
+                            </div>
+                            <div class="mt-6 space-y-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="steroid_drug" class="block text-sm font-medium text-slate-400 mb-1">Convert From</label>
+                                        <select id="steroid_drug" class="form-select-custom w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md shadow-sm transition text-white">
+                                            <option value="hydrocortisone" selected>Hydrocortisone</option><option value="cortisone">Cortisone</option><option value="prednisone">Prednisone</option><option value="prednisolone">Prednisolone</option><option value="methylprednisolone">Methylprednisolone</option><option value="triamcinolone">Triamcinolone</option><option value="dexamethasone">Dexamethasone</option><option value="betamethasone">Betamethasone</option>
+                                        </select>
+                                    </div>
+                                    <div><label for="steroid_dose" class="block text-sm font-medium text-slate-400 mb-1">Dose (mg)</label><input type="number" id="steroid_dose" placeholder="e.g., 20" class="form-input-custom w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md shadow-sm transition text-white"></div>
+                                </div>
+                                <button onclick="calculateSteroidEquivalence()" class="w-full mt-4 bg-cyan-600 text-white font-semibold py-2.5 px-4 rounded-md hover:bg-cyan-700 focus:outline-none focus:ring-4 focus:ring-cyan-500/50 transition-all duration-200 shadow-lg shadow-cyan-600/20">Calculate</button>
+                            </div>
+                            <div id="steroidResultsSection" class="hidden space-y-4 pt-6">
+                                <h2 class="text-xl font-bold text-slate-100 border-b border-slate-700 pb-2">Equivalent Anti-inflammatory Doses</h2>
+                                <div id="steroidResultsList" class="space-y-2"></div>
+                            </div>
+                        </section>
+                        <section>
+                            <header class="text-center flex flex-col items-center gap-2"><h2 class="text-2xl md:text-3xl font-bold text-slate-100">Corticosteroid Potency Reference</h2></header>
+                            <div class="overflow-x-auto mt-6">
+                                <table class="min-w-full divide-y divide-slate-700">
+                                    <thead class="bg-slate-900/50">
+                                        <tr><th scope="col" class="px-6 py-3 text-left text-xs font-medium text-cyan-400 uppercase tracking-wider">Corticosteroid</th><th scope="col" class="px-6 py-3 text-left text-xs font-medium text-cyan-400 uppercase tracking-wider">Equivalent Dose (mg)</th><th scope="col" class="px-6 py-3 text-left text-xs font-medium text-cyan-400 uppercase tracking-wider">Anti-inflammatory Potency</th><th scope="col" class="px-6 py-3 text-left text-xs font-medium text-cyan-400 uppercase tracking-wider">Mineralocorticoid Potency</th></tr>
+                                    </thead>
+                                    <tbody class="bg-slate-800 divide-y divide-slate-700">
+                                        <tr class="hover:bg-slate-700/50 transition-colors"><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-100">Hydrocortisone</td><td class="px-6 py-4 whitespace-nowrap text-sm text-slate-300">20</td><td class="px-6 py-4 whitespace-nowrap text-sm text-slate-300">1</td><td class="px-6 py-4 whitespace-nowrap text-sm text-slate-300">1</td></tr>
+                                        <tr class="hover:bg-slate-700/50 transition-colors"><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-100">Cortisone</td><td class="px-6 py-4 whitespace-nowrap text-sm text-slate-300">25</td><td class="px-6 py-4 whitespace-nowrap text-sm text-slate-300">0.8</td><td class="px-6 py-4 whitespace-nowrap text-sm text-slate-300">0.8</td></tr>
+                                        <tr class="hover:bg-slate-700/50 transition-colors"><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-100">Prednisone</td><td class="px-6 py-4 whitespace-nowrap text-sm text-slate-300">5</td><td class="px-6 py-4 whitespace-nowrap text-sm text-slate-300">4</td><td class="px-6 py-4 whitespace-nowrap text-sm text-slate-300">0.6</td></tr>
+                                        <tr class="hover:bg-slate-700/50 transition-colors"><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-100">Prednisolone</td><td class="px-6 py-4 whitespace-nowrap text-sm text-slate-300">5</td><td class="px-6 py-4 whitespace-nowrap text-sm text-slate-300">4</td><td class="px-6 py-4 whitespace-nowrap text-sm text-slate-300">0.6</td></tr>
+                                        <tr class="hover:bg-slate-700/50 transition-colors"><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-100">Methylprednisolone</td><td class="px-6 py-4 whitespace-nowrap text-sm text-slate-300">4</td><td class="px-6 py-4 whitespace-nowrap text-sm text-slate-300">5</td><td class="px-6 py-4 whitespace-nowrap text-sm text-slate-300">0.5</td></tr>
+                                        <tr class="hover:bg-slate-700/50 transition-colors"><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-100">Triamcinolone</td><td class="px-6 py-4 whitespace-nowrap text-sm text-slate-300">4</td><td class="px-6 py-4 whitespace-nowrap text-sm text-slate-300">5</td><td class="px-6 py-4 whitespace-nowrap text-sm text-slate-300">0</td></tr>
+                                        <tr class="hover:bg-slate-700/50 transition-colors"><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-100">Dexamethasone</td><td class="px-6 py-4 whitespace-nowrap text-sm text-slate-300">0.75</td><td class="px-6 py-4 whitespace-nowrap text-sm text-slate-300">25</td><td class="px-6 py-4 whitespace-nowrap text-sm text-slate-300">0</td></tr>
+                                        <tr class="hover:bg-slate-700/50 transition-colors"><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-100">Betamethasone</td><td class="px-6 py-4 whitespace-nowrap text-sm text-slate-300">0.6</td><td class="px-6 py-4 whitespace-nowrap text-sm text-slate-300">25</td><td class="px-6 py-4 whitespace-nowrap text-sm text-slate-300">0</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+
             </div>
-        </section>
-
-        <!-- Calcium Infusion Rate Calculator -->
-        <section class="space-y-4">
-            <h2 class="text-lg font-semibold text-cyan-400 border-b border-slate-700 pb-2">Calcium Gluconate Infusion</h2>
-            <p class="text-sm text-slate-500 mb-4 -mt-2">Fill all other fields, then click "Calc" for the one you need.</p>
-
-            <div id="infusionCalc" class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-                <!-- Rate -->
-                <div>
-                    <div class="flex items-center justify-between mb-1">
-                        <label for="infusion_rate" class="text-sm font-medium text-slate-400">Infusion Rate (mg/kg/hr)</label>
-                        <button onclick="calculateInfusion('rate')" class="bg-slate-700 hover:bg-slate-600 text-cyan-400 text-xs font-semibold py-1 px-3 rounded-full transition-colors">Calc</button>
-                    </div>
-                    <input type="number" id="infusion_rate" placeholder="e.g., 1.5" class="form-input-custom w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md shadow-sm transition text-white">
-                </div>
-                <!-- Weight -->
-                <div>
-                    <div class="flex items-center justify-between mb-1">
-                        <label for="infusion_weight" class="text-sm font-medium text-slate-400">Patient Weight (kg)</label>
-                        <button onclick="calculateInfusion('weight')" class="bg-slate-700 hover:bg-slate-600 text-cyan-400 text-xs font-semibold py-1 px-3 rounded-full transition-colors">Calc</button>
-                    </div>
-                    <input type="number" id="infusion_weight" placeholder="e.g., 70" class="form-input-custom w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md shadow-sm transition text-white">
-                </div>
-                <!-- Ca Gluconate -->
-                <div>
-                    <div class="flex items-center justify-between mb-1">
-                       <label for="infusion_caVolume" class="text-sm font-medium text-slate-400">10% Ca Gluconate (mL)</label>
-                       <button onclick="calculateInfusion('caVolume')" class="bg-slate-700 hover:bg-slate-600 text-cyan-400 text-xs font-semibold py-1 px-3 rounded-full transition-colors">Calc</button>
-                    </div>
-                    <input type="number" id="infusion_caVolume" class="form-input-custom w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md shadow-sm transition text-white" placeholder="e.g., 100">
-                </div>
-                <!-- Diluent Volume -->
-                <div>
-                    <div class="flex items-center justify-between mb-1">
-                        <label for="infusion_ivVolume" class="text-sm font-medium text-slate-400">Diluent Volume (mL)</label>
-                        <button onclick="calculateInfusion('ivVolume')" class="bg-slate-700 hover:bg-slate-600 text-cyan-400 text-xs font-semibold py-1 px-3 rounded-full transition-colors">Calc</button>
-                    </div>
-                    <input type="number" id="infusion_ivVolume" placeholder="e.g., 900" class="form-input-custom w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md shadow-sm transition text-white">
-                </div>
-                 <!-- Total Fluid Volume -->
-                <div>
-                     <div class="flex items-center justify-between mb-1">
-                        <label for="infusion_totalVolume" class="text-sm font-medium text-slate-400">Total Fluid Volume (mL)</label>
-                    </div>
-                    <input type="number" id="infusion_totalVolume" placeholder="Auto-calculated" class="form-input-custom w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md shadow-sm transition text-white">
-                </div>
-                <!-- Drip Rate -->
-                <div>
-                     <div class="flex items-center justify-between mb-1">
-                        <label for="infusion_dripRate" class="text-sm font-medium text-slate-400">IV Drip Rate (mL/hr)</label>
-                        <button onclick="calculateInfusion('dripRate')" class="bg-slate-700 hover:bg-slate-600 text-cyan-400 text-xs font-semibold py-1 px-3 rounded-full transition-colors">Calc</button>
-                    </div>
-                    <input type="number" id="infusion_dripRate" placeholder="e.g., 50" class="form-input-custom w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md shadow-sm transition text-white">
-                </div>
-            </div>
-        </section>
-        
-        <!-- Toggle Button for Duration Section -->
-        <div class="text-center pt-2">
-            <button id="toggleDurationBtn" onclick="toggleDurationSection()" class="text-sm text-cyan-500 hover:text-cyan-400 font-medium transition">
-                Show Infusion Duration Calculator
-            </button>
-        </div>
-
-        <!-- Infusion Duration Calculator (hidden by default) -->
-        <section id="durationSection" class="hidden transition-all duration-500">
-             <h2 class="text-lg font-semibold text-cyan-400 border-b border-slate-700 pb-2 mb-4">Infusion Duration</h2>
-             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-                 <div>
-                    <div class="flex items-center justify-between mb-1">
-                         <label for="duration_totalVolume" class="text-sm font-medium text-slate-400">Total Volume (mL)</label>
-                         <button onclick="calculateDuration('totalVolume')" class="bg-slate-700 hover:bg-slate-600 text-cyan-400 text-xs font-semibold py-1 px-3 rounded-full transition-colors">Calc</button>
-                    </div>
-                    <input type="number" id="duration_totalVolume" class="form-input-custom w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md shadow-sm transition text-white" placeholder="Value from above">
-                 </div>
-                 <div>
-                      <div class="flex items-center justify-between mb-1">
-                           <label for="duration_dripRate" class="text-sm font-medium text-slate-400">Drip Rate (mL/hr)</label>
-                           <button onclick="calculateDuration('dripRate')" class="bg-slate-700 hover:bg-slate-600 text-cyan-400 text-xs font-semibold py-1 px-3 rounded-full transition-colors">Calc</button>
-                      </div>
-                      <input type="number" id="duration_dripRate" class="form-input-custom w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md shadow-sm transition text-white" placeholder="Value from above">
-                 </div>
-                 <div>
-                      <div class="flex items-center justify-between mb-1">
-                           <label for="duration_time" class="text-sm font-medium text-slate-400">Time (hours)</label>
-                           <button onclick="calculateDuration('time')" class="bg-slate-700 hover:bg-slate-600 text-cyan-400 text-xs font-semibold py-1 px-3 rounded-full transition-colors">Calc</button>
-                      </div>
-                      <input type="number" id="duration_time" class="form-input-custom w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md shadow-sm transition text-white" placeholder="e.g., 20">
-                 </div>
-             </div>
-        </section>
-
+        </main>
     </div>
 
+    <!-- Copy Alert -->
+    <div id="copy-alert" class="hidden opacity-0 bg-white text-gray-800 p-4 rounded-lg shadow-lg border border-gray-200"></div>
+
     <script>
-    // --- START: UNCHANGED JAVASCRIPT LOGIC ---
-    const ELEMENTAL_CA_IN_GLUCONATE = 9.3; // mg per mL of 10% solution
-    
-    // --- Utility Functions ---
-    const errorMessageDiv = document.getElementById('errorMessage');
-    const errorMessageText = document.getElementById('errorMessageText');
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- DATA STORE (from order.html) ---
+            const antibioticData = {
+                "Meropenem": { tiers: { "Usual Dose (1 g q8h)": { loading: "Not Required", doses: [{ min: 50.01, max: 130, dose: "1 g every 8 hours" }, { min: 25.01, max: 50, dose: "1 g every 12 hours" }, { min: 10, max: 25, dose: "500 mg every 12 hours" }], rrt: { "IHD": "500 mg every 24 hours, give after dialysis (AD) on HD days", "PD": "500 mg every 24 hours", "CRRT_II": "500 mg to 1 g every 8 hours", "CRRT_CI": "1 g infused over 12 hours, every 12 hours", "PIRRT_SLED": "1 g every 12 hours (Up to 2 g q8h if residual diuresis)" } }, "High Dose (2 g q8h)": { loading: "2 g (for Extended Infusion)", doses: [{ min: 50.01, max: 130, dose: "2 g every 8 hours" }, { min: 25.01, max: 50, dose: "2 g every 12 hours" }, { min: 10, max: 25, dose: "1 g every 12 hours" }, { min: 0, max: 9.99, dose: "1 g q24h or 500 mg q12h" }], rrt: { "IHD": "1 g every 24 hours or 500 mg every 12 hours, give after dialysis (AD) on HD days", "PD": "1 g q24h or 500 mg q12h", "CRRT_II": "500 mg to 1 g every 8 hours", "CRRT_CI": "1 g infused over 12 hours, every 12 hours", "PIRRT_SLED": "1 g every 12 hours (Up to 2 g q8h if residual diuresis)" } } } },
+                "Piperacillin/Tazobactam": { tiers: { "High Dose (Antipseudomonal)": { loading: "4.5 g (for EI or CI)", doses: [{ min: 40.01, max: 130, dose: "4.5 g q6h (Extended Infusion preferred)" }, { min: 20, max: 40, dose: "3.375 g every 6 hours" }, { min: 0, max: 19.99, dose: "2.25 g every 6 hours" }], rrt: { "IHD": "4.5 g every 12 hours OR 2.25 g every 8 hours; plus a supplemental 2.25 g dose after dialysis on HD days", "PD": "4.5 g every 12 hours OR 2.25 g every 8 hours", "CRRT": "4.5 g every 8 hours OR 2.25 g every 6 hours OR 9 g/24h continuous infusion", "PIRRT_SLED": "3.375 g every 8 hours" } } } },
+                "Levofloxacin": { tiers: { "High Dose (750 mg q24h)": { loading: "750 mg x 1", doses: [{ min: 50, max: Infinity, dose: "750 mg every 24 hours" }, { min: 20, max: 49.99, dose: "750 mg every 48 hours" }, { min: 0, max: 19.99, dose: "500 mg every 48 hours" }], rrt: { "IHD": "500 mg every 48 hours", "PD": "500 mg every 48 hours", "CRRT": "500 mg every 48 hours" } } } },
+                "Ceftazidime": { tiers: { "Usual Dose (1 g q8h)": { loading: "Not Required", doses: [{ min: 50.01, max: Infinity, dose: "1 g every 8 hours" }, { min: 31, max: 50, dose: "1 g every 12 hours" }, { min: 16, max: 30.99, dose: "1 g every 24 hours" }, { min: 0, max: 15.99, dose: "500 mg every 24 hours" }], rrt: { "IHD": "500 mg - 1 g q24h post-HD OR 1 g 3x/week post-HD", "PD": "1 g every 24 hours", "CRRT_II": "2 g q8-12h", "CRRT_CI": "3 g/24h continuous infusion", "PIRRT_SLED": "2 g every 12 hours" } }, "High Dose (2 g q8h)": { loading: "2 g (for Extended Infusion)", doses: [{ min: 50.01, max: Infinity, dose: "2 g every 8 hours" }, { min: 31, max: 50, dose: "2 g every 12 hours" }, { min: 16, max: 30.99, dose: "2 g every 24 hours" }, { min: 0, max: 15.99, dose: "1 g every 24 hours" }], rrt: { "IHD": "500 mg - 1 g q24h post-HD OR 1 g 3x/week post-HD", "PD": "1 g every 24 hours", "CRRT_II": "2 g q8-12h", "CRRT_CI": "3 g/24h continuous infusion", "PIRRT_SLED": "2 g every 12 hours" } } } },
+                "Imipenem/Cilastatin": { tiers: { "Usual Dose (500 mg q6h)": { loading: "Not Required", doses: [{ min: 60, max: 130, dose: "500 mg every 6 hours" }, { min: 30, max: 59.99, dose: "250 mg every 6 hours OR 500 mg every 8 hours" }, { min: 15, max: 29.99, dose: "250 mg every 8 hours OR 500 mg every 12 hours" }, { min: 0, max: 14.99, dose: "Do not administer unless HD is instituted within 48 hours." }], rrt: { "IHD": "250 to 500 mg every 12 hours (give after HD)", "PD": "250 to 500 mg every 12 hours", "CRRT": "1 g loading dose, then 250 mg q6h or 500 mg q6-8h", "PIRRT_SLED": "500 mg to 1 g loading dose, then 250 mg q6h or 500 mg q8h (give after PIRRT). Note: Higher doses increase neurotoxicity risk; consider alternatives." } }, "Usual Dose (1 g q8h)": { loading: "Not Required", doses: [{ min: 60, max: 130, dose: "1 g every 8 hours" }, { min: 30, max: 59.99, dose: "500 mg every 8 hours" }, { min: 15, max: 29.99, dose: "250 mg every 8 hours OR 500 mg every 12 hours" }, { min: 0, max: 14.99, dose: "Do not administer unless HD is instituted within 48 hours." }], rrt: { "IHD": "250 to 500 mg every 12 hours (give after HD)", "PD": "250 to 500 mg every 12 hours", "CRRT": "1 g loading dose, then 250 mg q6h or 500 mg q6-8h", "PIRRT_SLED": "500 mg to 1 g loading dose, then 250 mg q6h or 500 mg q8h (give after PIRRT). Note: Higher doses increase neurotoxicity risk; consider alternatives." } }, "Usual Dose (1 g q6h)": { loading: "Not Required", doses: [{ min: 60, max: 130, dose: "1 g every 6 hours" }, { min: 30, max: 59.99, dose: "500 mg every 6 hours" }, { min: 15, max: 29.99, dose: "250 mg every 6 hours" }, { min: 0, max: 14.99, dose: "Do not administer unless HD is instituted within 48 hours." }], rrt: { "IHD": "250 to 500 mg every 12 hours (give after HD)", "PD": "250 to 500 mg every 12 hours", "CRRT": "1 g loading dose, then 250 mg q6h or 500 mg q6-8h", "PIRRT_SLED": "500 mg to 1 g loading dose, then 250 mg q6h or 500 mg q8h (give after PIRRT). Note: Higher doses increase neurotoxicity risk; consider alternatives." } } } },
+                "IV Fosfomycin": { tiers: { "All Systemic Infections": { loading: "6 - 8 g IV x 1 dose", pathogens: { "E. coli": [{ min: 80, max: 100, dose: "2 g q12h" }, { min: 40, max: 50, dose: "1 g q12h" }, { min: 20, max: 30, dose: "500 mg q12h" }], "K. pneumo": [{ min: 80, max: 100, dose: "4 g q12h" }, { min: 40, max: 50, dose: "2 g q12h" }, { min: 20, max: 30, dose: "1 g q12h" }], "Pseudo/Acine": [{ min: 80, max: 100, dose: "4 g q8h" }, { min: 40, max: 50, dose: "2 g q8h" }, { min: 20, max: 30, dose: "1 g q8h" }] } } } },
+                "Colistin": { tiers: { "All Indications": { loading: "300 mg IV (Universal)", doses: [{ min: 80.01, max: Infinity, dose: "150 mg every 8 - 12 hours" }, { min: 40.01, max: 80, dose: "150 mg every 12 hours" }, { min: 20.01, max: 40, dose: "100 mg every 12 hours" }, { min: 0, max: 20, dose: "150 mg every 24 hours" }], rrt: { "IHD": "Non-dialysis day: 150 mg q24h; Dialysis day: 200 mg post-dialysis", "CRRT": "150 mg every 8 hours", "PD": "100 mg every 24 hours" } } } }
+            };
+            const fullAtbTableData = [
+                { antibiotic: "Meropenem", indication: "Usual Dose (1 g q8h)", loading: "Not Required", crcl: ">50 to <130", dose: "1 g every 8 hours", rowspan: 4 }, { crcl: ">25 to ≤50", dose: "1 g every 12 hours" }, { crcl: "10 to ≤25", dose: "500 mg every 12 hours" }, { crcl: "IHD", dose: "500 mg every 24 hours, give after dialysis (AD) on HD days" },
+                { antibiotic: "Meropenem", indication: "High Dose (2 g q8h, CNS, CF, high MIC)", loading: "2 g (for Extended Infusion)", crcl: ">50 to <130", dose: "2 g every 8 hours", rowspan: 4 }, { crcl: ">25 to ≤50", dose: "2 g every 12 hours" }, { crcl: "10 to ≤25", dose: "1 g every 12 hours" }, { crcl: "IHD", dose: "1 g every 24 hours or 500 mg every 12 hours, give after dialysis (AD) on HD days" },
+                { antibiotic: "Meropenem", indication: "RRT Dosing (Specific Regimens)", loading: "1 g", crcl: "CRRT (Intermittent Infusion)", dose: "500 mg to 1 g every 8 hours", rowspan: 3 }, { crcl: "CRRT (Continuous Infusion)", dose: "1 g infused over 12 hours, every 12 hours" }, { crcl: "PIRRT / SLED", dose: "1 g every 12 hours (Up to 2 g q8h if residual diuresis)" },
+                { antibiotic: "Piperacillin/Tazobactam", indication: "High Dose (Antipseudomonal)", loading: "4.5 g (for EI or CI)", crcl: ">40 to <130", dose: "4.5 g q6h (Extended Infusion preferred)", rowspan: 3 }, { crcl: "20 - 40", dose: "3.375 g every 6 hours" }, { crcl: "<20", dose: "2.25 g every 6 hours" },
+                { antibiotic: "Piperacillin/Tazobactam", indication: "Renal Replacement Therapy", loading: "4.5 g (for EI or CI)", crcl: "Hemodialysis (IHD) / PD", dose: "4.5 g every 12 hours OR 2.25 g every 8 hours; plus a supplemental 2.25 g dose after dialysis on HD days", rowspan: 3 }, { crcl: "CRRT", dose: "4.5 g every 8 hours OR 2.25 g every 6 hours OR 9 g/24h continuous infusion" }, { crcl: "PIRRT / SLED", dose: "3.375 g every 8 hours" },
+                { antibiotic: "Levofloxacin", indication: "High Dose (750 mg q24h, HAP/VAP)", loading: "750 mg x 1", crcl: ">50", dose: "750 mg every 24 hours", rowspan: 4 }, { crcl: "20-49", dose: "750 mg every 48 hours" }, { crcl: "<20", dose: "500 mg every 48 hours" }, { crcl: "IHD / PD / CRRT", dose: "500 mg every 48 hours" },
+                { antibiotic: "Ceftazidime", indication: "Usual Dose (1 g q8h)", loading: "Not Required", crcl: ">50", dose: "1 g every 8 hours", rowspan: 4 }, { crcl: "31 - 50", dose: "1 g every 12 hours" }, { crcl: "16 - 30", dose: "1 g every 24 hours" }, { crcl: "≤15", dose: "500 mg every 24 hours" },
+                { antibiotic: "Ceftazidime", indication: "High Dose (2 g q8h, Antipseudomonal)", loading: "2 g (for Extended Infusion)", crcl: ">50", dose: "2 g every 8 hours", rowspan: 4 }, { crcl: "31 - 50", dose: "2 g every 12 hours" }, { crcl: "16 - 30", dose: "2 g every 24 hours" }, { crcl: "≤15", dose: "1 g every 24 hours" },
+                { antibiotic: "Ceftazidime", indication: "RRT Dosing (Specific Regimens)", loading: "2 g (for CRRT Continuous Infusion)", crcl: "Hemodialysis (IHD)", dose: "500 mg - 1 g q24h post-HD OR 1 g 3x/week post-HD", rowspan: 4 }, { crcl: "Peritoneal Dialysis (PD)", dose: "1 g every 24 hours" }, { crcl: "CRRT", dose: "2 g q8-12h OR 3 g/24h continuous infusion" }, { crcl: "PIRRT / SLED", dose: "2 g every 12 hours" },
+                { antibiotic: "Imipenem/Cilastatin", indication: "Usual Dose (500 mg q6h)", loading: "Not Required", crcl: "≥60 to <130", dose: "500 mg every 6 hours", rowspan: 4 }, { crcl: "≥30 to <60", dose: "250 mg every 6 hours OR 500 mg every 8 hours" }, { crcl: "≥15 to <30", dose: "250 mg every 8 hours OR 500 mg every 12 hours" }, { crcl: "<15", dose: "Do not administer unless HD is instituted within 48 hours." },
+                { antibiotic: "Imipenem/Cilastatin", indication: "Usual Dose (1 g q8h)", loading: "Not Required", crcl: "≥60 to <130", dose: "1 g every 8 hours", rowspan: 4 }, { crcl: "≥30 to <60", dose: "500 mg every 8 hours" }, { crcl: "≥15 to <30", dose: "250 mg every 8 hours OR 500 mg every 12 hours" }, { crcl: "<15", dose: "Do not administer unless HD is instituted within 48 hours." },
+                { antibiotic: "Imipenem/Cilastatin", indication: "Usual Dose (1 g q6h)", loading: "Not Required", crcl: "≥60 to <130", dose: "1 g every 6 hours", rowspan: 4 }, { crcl: "≥30 to <60", dose: "500 mg every 6 hours" }, { crcl: "≥15 to <30", dose: "250 mg every 6 hours" }, { crcl: "<15", dose: "Do not administer unless HD is instituted within 48 hours." },
+                { antibiotic: "Imipenem/Cilastatin", indication: "Renal Replacement Therapy", loading: "Note RRT Loading Doses", crcl: "IHD", dose: "250 to 500 mg every 12 hours (give after HD)", rowspan: 4 }, { crcl: "PD", dose: "250 to 500 mg every 12 hours" }, { crcl: "CRRT", dose: "1 g loading dose, then 250 mg q6h or 500 mg q6-8h" }, { crcl: "PIRRT / SLED", dose: "500 mg to 1 g loading dose, then 250 mg q6h or 500 mg q8h (give after PIRRT)" },
+                { antibiotic: "IV Fosfomycin", indication: "All Systemic Infections", loading: "6 - 8 g x 1 dose", crcl: "80 - 100", dose: "• E. coli: 2 g q12h • K. pneumo: 4 g q12h • Pseudo/Acine: 4 g q8h", rowspan: 3 }, { crcl: "40 - 50", dose: "• E. coli: 1 g q12h • K. pneumo: 2 g q12h • Pseudo/Acine: 2 g q8h" }, { crcl: "20 - 30", dose: "• E. coli: 500 mg q12h • K. pneumo: 1 g q12h • Pseudo/Acine: 1 g q8h" },
+                { antibiotic: "Colistin", indication: "All Indications", loading: "300 mg (Universal)", crcl: ">80", dose: "150 mg every 8 - 12 hours", rowspan: 4 }, { crcl: ">40 to 80", dose: "150 mg every 12 hours" }, { crcl: ">20 to 40", dose: "100 mg every 12 hours" }, { crcl: "≤20", dose: "150 mg every 24 hours" },
+                { antibiotic: "Colistin", indication: "All Indications (RRT)", loading: "300 mg (Universal)", crcl: "IHD", dose: "Non-dialysis day: 150 mg q24h; Dialysis day: 200 mg post-dialysis", rowspan: 3 }, { crcl: "CRRT", dose: "150 mg every 8 hours" }, { crcl: "PD", dose: "100 mg every 24 hours" },
+            ];
 
-    function showError(message) {
-        errorMessageText.textContent = message;
-        errorMessageDiv.classList.remove('hidden');
-    }
+            // --- GENERAL UTILITY ---
+            const getEl = (id) => document.getElementById(id);
+            const querySel = (selector) => document.querySelector(selector);
+            const querySelAll = (selector) => document.querySelectorAll(selector);
 
-    function hideError() {
-        errorMessageDiv.classList.add('hidden');
-    }
+            // --- Sidebar Navigation Logic ---
+            const sidebar = getEl('sidebar');
+            const sidebarToggle = getEl('sidebar-toggle');
+            const sidebarOverlay = getEl('sidebar-overlay');
+            const navLinks = querySelAll('.nav-link');
+            const contentPages = querySelAll('.content-page');
+            const pageTitle = getEl('page-title');
 
-    // --- Corrected Calcium ---
-    function calculateCorrectedCalcium() {
-        hideError();
-        const totalCa = parseFloat(document.getElementById('totalCalcium').value);
-        const albumin = parseFloat(document.getElementById('albumin').value);
-        const resultDiv = document.getElementById('correctedCalciumResult');
-        const resultP = resultDiv.querySelector('p');
-
-        if (isNaN(totalCa) || isNaN(albumin)) {
-            showError("Please enter valid numbers for both Total Calcium and Albumin.");
-            resultDiv.classList.add('hidden');
-            return;
-        }
-
-        const correctedCa = totalCa + (0.8 * (4.0 - albumin));
-        resultP.innerHTML = `Corrected Calcium: <span class="font-bold text-white">${correctedCa.toFixed(2)} mg/dL</span>`;
-        resultDiv.classList.remove('hidden');
-    }
-
-    // --- Infusion Calculations ---
-    const infusionInputs = {
-        rate: document.getElementById('infusion_rate'),
-        weight: document.getElementById('infusion_weight'),
-        caVolume: document.getElementById('infusion_caVolume'),
-        ivVolume: document.getElementById('infusion_ivVolume'),
-        totalVolume: document.getElementById('infusion_totalVolume'),
-        dripRate: document.getElementById('infusion_dripRate')
-    };
-    
-    // --- Duration Calculations ---
-    const durationInputs = {
-        totalVolume: document.getElementById('duration_totalVolume'),
-        dripRate: document.getElementById('duration_dripRate'),
-        time: document.getElementById('duration_time')
-    };
-
-    // --- Event Listeners for Input Syncing and Auto-Calculation ---
-    function setupEventListeners() {
-        // Volume auto-calculation logic
-        ['caVolume', 'ivVolume', 'totalVolume'].forEach(key => {
-            infusionInputs[key].addEventListener('input', () => handleVolumeChange(infusionInputs[key]));
-        });
-
-        // Sync main inputs TO duration inputs
-        infusionInputs.totalVolume.addEventListener('input', () => durationInputs.totalVolume.value = infusionInputs.totalVolume.value);
-        infusionInputs.dripRate.addEventListener('input', () => durationInputs.dripRate.value = infusionInputs.dripRate.value);
-
-        // Sync duration inputs TO main inputs
-        durationInputs.totalVolume.addEventListener('input', () => {
-            infusionInputs.totalVolume.value = durationInputs.totalVolume.value;
-            handleVolumeChange(infusionInputs.totalVolume); // Recalculate diluent if total changes
-        });
-        durationInputs.dripRate.addEventListener('input', () => infusionInputs.dripRate.value = durationInputs.dripRate.value);
-    }
-    setupEventListeners();
-
-    function handleVolumeChange(changedElement) {
-        const caVolume = parseFloat(infusionInputs.caVolume.value);
-        const ivVolume = parseFloat(infusionInputs.ivVolume.value);
-        const totalVolume = parseFloat(infusionInputs.totalVolume.value);
-
-        if (changedElement === infusionInputs.caVolume || changedElement === infusionInputs.ivVolume) {
-            if (!isNaN(caVolume) && !isNaN(ivVolume)) {
-                const newTotal = caVolume + ivVolume;
-                infusionInputs.totalVolume.value = newTotal > 0 ? newTotal.toFixed(2) : '';
-                durationInputs.totalVolume.value = infusionInputs.totalVolume.value; // Sync
-            }
-        } else if (changedElement === infusionInputs.totalVolume) {
-            if (!isNaN(totalVolume) && !isNaN(caVolume) && totalVolume >= caVolume) {
-                 const newDiluent = totalVolume - caVolume;
-                 infusionInputs.ivVolume.value = newDiluent >= 0 ? newDiluent.toFixed(2) : '';
-            }
-        }
-    }
-
-    function calculateInfusion(targetKey) {
-        hideError();
-        let filledValues = {};
-
-        for (const key in infusionInputs) {
-            infusionInputs[key].classList.remove('calculated-field');
-            if (key !== targetKey) {
-                const value = infusionInputs[key].value;
-                filledValues[key] = value === '' ? NaN : parseFloat(value);
-            }
-        }
-        
-        const targetInput = infusionInputs[targetKey];
-        let result = NaN;
-
-        try {
-            const { rate, weight, caVolume, ivVolume, dripRate } = filledValues;
-            let totalVolume = filledValues.totalVolume;
-
-            if (isNaN(totalVolume)) {
-                if (!isNaN(caVolume) && !isNaN(ivVolume)) {
-                    totalVolume = caVolume + ivVolume;
+            function switchPage(targetId, linkElement) {
+                contentPages.forEach(page => page.classList.add('hidden'));
+                const targetPage = getEl(targetId);
+                if (targetPage) {
+                    targetPage.classList.remove('hidden');
+                }
+                navLinks.forEach(link => {
+                    link.classList.remove('bg-blue-600', 'text-white', 'font-semibold');
+                    link.classList.add('hover:bg-gray-700');
+                });
+                if(linkElement) {
+                    linkElement.classList.add('bg-blue-600', 'text-white', 'font-semibold');
+                    linkElement.classList.remove('hover:bg-gray-700');
+                    pageTitle.textContent = linkElement.querySelector('span').textContent;
+                }
+                if (window.innerWidth < 768) {
+                    sidebar.classList.add('-translate-x-full');
+                    sidebarOverlay.classList.add('hidden');
                 }
             }
             
-            if (targetKey !== 'totalVolume' && isNaN(totalVolume)) {
-                showError("Please provide enough volume information (e.g., Ca Gluconate and Diluent)."); return;
-            }
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = e.currentTarget.dataset.target;
+                    switchPage(targetId, e.currentTarget);
+                });
+            });
 
-            switch (targetKey) {
-                case 'rate':
-                    if (isNaN(weight) || isNaN(dripRate) || isNaN(caVolume)) { showError("Provide Weight, Drip Rate, Ca Gluconate, and volume info."); return; }
-                    if (weight <= 0 || totalVolume <= 0) { showError("Weight and total volume must be positive."); return; };
-                    result = ((caVolume * ELEMENTAL_CA_IN_GLUCONATE) / totalVolume * dripRate) / weight;
-                    break;
-                case 'dripRate':
-                    if (isNaN(rate) || isNaN(weight) || isNaN(caVolume)) { showError("Provide Rate, Weight, Ca Gluconate, and volume info."); return; }
-                    if (weight <= 0 || caVolume <= 0) { showError("Weight and Ca Gluconate volume must be positive."); return; };
-                    result = (rate * weight * totalVolume) / (caVolume * ELEMENTAL_CA_IN_GLUCONATE);
-                    break;
-                case 'ivVolume':
-                    if (isNaN(rate) || isNaN(weight) || isNaN(dripRate) || isNaN(caVolume)) { showError("Provide Rate, Weight, Drip Rate, and Ca Gluconate Volume."); return; }
-                    if (rate <= 0 || weight <= 0 || dripRate <= 0) { showError("Rate, Weight, and Drip Rate must be positive."); return; };
-                    const requiredTotalVol = (caVolume * ELEMENTAL_CA_IN_GLUCONATE * dripRate) / (rate * weight);
-                    result = requiredTotalVol - caVolume;
-                    break;
-                case 'caVolume':
-                    if (isNaN(rate) || isNaN(weight) || isNaN(dripRate)) { showError("Provide Rate, Weight, Drip Rate, and volume info."); return; }
-                    if (rate <= 0 || weight <= 0 || dripRate <= 0) { showError("Rate, Weight, and Drip Rate must be positive."); return; };
-                    result = (rate * weight * totalVolume) / (ELEMENTAL_CA_IN_GLUCONATE * dripRate);
-                    break;
-                case 'weight':
-                    if (isNaN(rate) || isNaN(dripRate) || isNaN(caVolume)) { showError("Provide Rate, Drip Rate, Ca Gluconate, and volume info."); return; }
-                    if (rate <= 0 || totalVolume <= 0) { showError("Rate and total volume must be positive."); return; };
-                    result = ((caVolume * ELEMENTAL_CA_IN_GLUCONATE) / totalVolume * dripRate) / rate;
-                    break;
-            }
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('-translate-x-full');
+                sidebarOverlay.classList.toggle('hidden');
+            });
+            sidebarOverlay.addEventListener('click', () => {
+                 sidebar.classList.add('-translate-x-full');
+                 sidebarOverlay.classList.add('hidden');
+            });
 
-            if (isNaN(result) || !isFinite(result) || result < 0) {
-                showError("Calculation resulted in an invalid number. Please check your inputs.");
-                return;
+
+            // --- ICU ORDERS LOGIC ---
+            const ventMode = getEl('vent-mode');
+            const vasopressorWeightInput = getEl('vasopressors-weight');
+            const crclWeightInput = getEl('crcl-weight');
+            const atbSelect = getEl('atb-select');
+
+            atbSelect?.addEventListener('change', populateDoseTiers);
+            ventMode?.addEventListener('change', toggleVentFields);
+            querySelAll('.copy-btn').forEach(btn => btn.addEventListener('click', onCopy));
+            getEl('calculate-crcl-btn')?.addEventListener('click', calculateCrCl);
+            getEl('calculate-atb-dose-btn')?.addEventListener('click', getAtbDose);
+            getEl('show-loading-dose-btn')?.addEventListener('click', showLoadingDose);
+
+            if (vasopressorWeightInput && crclWeightInput) {
+                vasopressorWeightInput.addEventListener('input', () => crclWeightInput.value = vasopressorWeightInput.value);
+                crclWeightInput.addEventListener('input', () => vasopressorWeightInput.value = crclWeightInput.value);
             }
             
-            targetInput.value = result.toFixed(2);
-            targetInput.classList.add('calculated-field');
+            function setupPresetButtons(groupSelector, inputId) {
+                const group = querySel(groupSelector);
+                if (!group) return;
+                group.addEventListener('click', (e) => {
+                    if (e.target.closest('.preset-btn')) {
+                        const clickedButton = e.target.closest('.preset-btn');
+                        group.querySelectorAll('.preset-btn').forEach(b => {
+                            b.classList.remove('bg-blue-600', 'text-white', 'ring-2', 'ring-blue-500');
+                            b.classList.add('border-gray-300', 'text-gray-700');
+                        });
+                        clickedButton.classList.add('bg-blue-600', 'text-white', 'ring-2', 'ring-blue-500');
+                        clickedButton.classList.remove('border-gray-300', 'text-gray-700');
+                        getEl(inputId).value = clickedButton.getAttribute('data-ratio');
+                    }
+                });
+            }
+
+            function populateDoseTiers() {
+                const doseTierSelect = getEl('atb-dose-tier');
+                const pathogenContainer = getEl('pathogen-container');
+                const pathogenSelect = getEl('atb-pathogen');
+                const selectedAtb = atbSelect.value;
+                const atb = antibioticData[selectedAtb];
+                
+                doseTierSelect.innerHTML = '';
+                pathogenContainer.classList.add('hidden');
+                if (!atb) return;
+
+                Object.keys(atb.tiers).forEach(tierName => {
+                    doseTierSelect.add(new Option(tierName, tierName));
+                });
+
+                if (selectedAtb === 'IV Fosfomycin') {
+                    pathogenContainer.classList.remove('hidden');
+                    const tier = atb.tiers[Object.keys(atb.tiers)[0]];
+                    pathogenSelect.innerHTML = '';
+                    Object.keys(tier.pathogens).forEach(pathogenName => {
+                        pathogenSelect.add(new Option(pathogenName, pathogenName));
+                    });
+                }
+            }
+
+            function toggleVentFields() {
+                const mode = ventMode.value;
+                const display = (selector, condition) => {
+                    querySel(selector).style.display = condition ? 'block' : 'none';
+                };
+                display('.vt-field', mode === 'VCV');
+                display('.ip-field', mode === 'PCV' || mode === 'SIMV');
+                display('.ps-field', mode === 'PSV' || mode === 'SIMV');
+                display('.rr-field', mode !== 'PSV');
+            }
+
+            function onCopy(evt) {
+                const btn = evt.currentTarget;
+                const id = btn.getAttribute('data-id');
+                const txt = buildText(id);
+                if (!txt) return; 
+                copyToClipboard(txt);
+                
+                const originalContent = btn.innerHTML;
+                btn.innerHTML = '<i class="ph ph-check-circle mr-2"></i>Copied!';
+                btn.disabled = true;
+                setTimeout(() => {
+                    btn.innerHTML = originalContent;
+                    btn.disabled = false;
+                }, 2000);
+                
+                showAlert(txt);
+            }
+
+            function buildText(id) {
+                if (id === 'vent') {
+                    const m = ventMode.value;
+                    const p = [];
+                    if (m === 'VCV') p.push(`VT ${getEl('vent-VT').value}`);
+                    if (m === 'PCV' || m === 'SIMV') p.push(`IP ${getEl('vent-IP').value}`);
+                    if (m === 'PSV' || m === 'SIMV') p.push(`PS ${getEl('vent-PS').value}`);
+                    if (m !== 'PSV') p.push(`RR ${getEl('vent-RR').value}`);
+                    p.push(`Ti ${getEl('vent-Ti').value}`);
+                    p.push(`FT ${getEl('vent-FT').value}`);
+                    p.push(`PEEP ${getEl('vent-PEEP').value}`);
+                    p.push(`FiO₂ ${getEl('vent-FiO2').value}`);
+                    return `On ventilator ${m} mode, ` + p.join(', ');
+                }
+                if (id === 'bd_feed') {
+                    const c = getEl('bd_feed-concentration').value;
+                    const v = getEl('bd_feed-volume').value;
+                    const f = getEl('bd_feed-frequency').value;
+                    const fl = getEl('bd_feed-flush').value;
+                    return `BD (${c || 'N/A'}) ${v || 'N/A'} ml x ${f || 'N/A'} feeds\nน้ำตาม ${fl || 'N/A'} ml/F`;
+                }
+                const vm = { norepi: 'Levophed', epi: 'Epinephrine', dopamine: 'Dopamine', dobutamine: 'Dobutamine', fentanyl: 'Fentanyl' };
+                if (vm[id]) {
+                    const title = vm[id];
+                    const ratioStr = getEl(id + '-concentration')?.value?.trim();
+                    const rate = parseFloat(getEl(id + '-rate').value);
+                    if (!ratioStr || isNaN(rate)) { alert('Error: Ratio or rate is missing or invalid for ' + title); return null; }
+                    if (id === 'fentanyl') return `${title} (${ratioStr}) IV rate ${rate} mL/hr`;
+                    
+                    const wt = parseFloat(vasopressorWeightInput.value);
+                    if (isNaN(wt) || wt <= 0) { alert('Error: Patient body weight is missing or invalid.'); return null; }
+                    
+                    const [numMg, volMl] = ratioStr.split(':').map(parseFloat);
+                    if (isNaN(numMg) || isNaN(volMl) || volMl === 0) { alert('Error: Invalid concentration ratio for ' + title); return null; }
+                    
+                    const dose = ((rate * (numMg / volMl) * 1000) / 60 / wt).toFixed(2);
+                    if (id === 'norepi' || id === 'epi') {
+                        const titrateVal = getEl(id + '-titrate').value.trim() || 'xx';
+                        return `${title} (${ratioStr})\nIV ${rate} mL/hr [${dose} µg/kg/min]\nTitrate ครั้งละ ${titrateVal} ml/hr to maintain MAP >= 65 mmHg`;
+                    }
+                    return `${title} (${ratioStr})\nIV ${rate} mL/hr [${dose} µg/kg/min]`;
+                }
+                const card = querySel(`[data-id="${id}"]`).closest('div');
+                const title = card.querySelector('h5').textContent;
+                const conc = getEl(id + '-concentration')?.value || '';
+                const rate = getEl(id + '-rate')?.value || '';
+                return `${title} (${conc}) IV rate ${rate} ml/hr`;
+            }
+
+            function calculateCrCl() {
+                const age = parseFloat(getEl('crcl-age').value);
+                const weight = parseFloat(getEl('crcl-weight').value);
+                const creatinine = parseFloat(getEl('crcl-creatinine').value);
+                const sex = getEl('crcl-sex').value;
+                const resultEl = getEl('crcl-result');
+                const atbCrclInput = getEl('atb-crcl');
+
+                if (isNaN(age) || isNaN(weight) || isNaN(creatinine) || age <= 0 || weight <= 0 || creatinine <= 0) {
+                    resultEl.textContent = 'Invalid Input';
+                    resultEl.classList.add('text-red-500');
+                    atbCrclInput.value = '';
+                    return;
+                }
+
+                let crcl = ((140 - age) * weight) / (72 * creatinine);
+                if (sex === 'female') crcl *= 0.85;
+                
+                const finalCrcl = crcl.toFixed(2);
+                resultEl.textContent = `${finalCrcl} mL/min`;
+                resultEl.classList.remove('text-red-500');
+                atbCrclInput.value = finalCrcl;
+            }
+
+            function getAtbDose() {
+                const atbName = getEl('atb-select').value;
+                const tierName = getEl('atb-dose-tier').value;
+                const crcl = parseFloat(getEl('atb-crcl').value);
+                let rrt = getEl('atb-rrt').value;
+                const resultEl = getEl('atb-dose-result');
+                
+                resultEl.innerHTML = '';
+                if (!atbName || !tierName || atbName === "Select an Antibiotic...") { resultEl.textContent = "Please select an antibiotic and tier."; return; }
+                
+                const atb = antibioticData[atbName];
+                const tier = atb.tiers[tierName];
+                let maintenanceDose = "Dosing not found for criteria.";
+                
+                if (rrt !== 'none') {
+                    if (tier.rrt && tier.rrt[rrt]) { maintenanceDose = tier.rrt[rrt]; } 
+                    else if (tier.rrt && tier.rrt.CRRT && rrt.startsWith('CRRT')) { maintenanceDose = tier.rrt.CRRT; }
+                } else if (isNaN(crcl)) {
+                    maintenanceDose = 'Please calculate CrCl first.';
+                } else {
+                    if (atbName === 'IV Fosfomycin') {
+                        const pathogen = getEl('atb-pathogen').value;
+                        const pathogenDoses = tier.pathogens[pathogen];
+                        for (const d of pathogenDoses) { if (crcl >= d.min && crcl <= d.max) { maintenanceDose = d.dose; break; } }
+                    } else if (tier.doses) {
+                        const sortedDoses = tier.doses.sort((a, b) => b.min - a.min);
+                        for (const d of sortedDoses) { if (crcl >= d.min) { maintenanceDose = d.dose; break; } }
+                    }
+                }
+                
+                const displayText = `<strong>Maintenance:</strong> ${maintenanceDose}`;
+                const copyText = `${atbName} ${maintenanceDose.includes('IV') ? '' : 'IV '}${maintenanceDose}`;
+
+                resultEl.innerHTML = displayText;
+                copyToClipboard(copyText);
+                showAlert(copyText);
+            }
+
+            function showLoadingDose() {
+                const atbName = getEl('atb-select').value;
+                const tierName = getEl('atb-dose-tier').value;
+                const resultEl = getEl('atb-dose-result');
+                
+                resultEl.innerHTML = '';
+                if (!atbName || !tierName || atbName === "Select an Antibiotic...") { resultEl.textContent = "Please select an antibiotic and tier."; return; }
+                
+                const loadingDose = antibioticData[atbName].tiers[tierName].loading;
+                const displayText = `<strong>Loading Dose:</strong> ${loadingDose}`;
+                const copyText = `${atbName} ${loadingDose}`;
+
+                resultEl.innerHTML = displayText;
+                copyToClipboard(copyText);
+                showAlert(copyText);
+            }
             
-            // Trigger updates if a volume or rate was calculated
-            if (targetKey === 'ivVolume' || targetKey === 'caVolume') {
-                handleVolumeChange(targetInput);
-            }
-             if (targetKey === 'dripRate') {
-                durationInputs.dripRate.value = targetInput.value;
-            }
+            function populateFullAtbTable() {
+                const tbody = getEl('atb-reference-tbody');
+                tbody.innerHTML = '';
+                let isOdd = false;
+                fullAtbTableData.forEach((row) => {
+                    const tr = document.createElement('tr');
+                    if (row.antibiotic) { isOdd = !isOdd; }
+                    if (isOdd) { tr.classList.add('bg-gray-50'); }
 
-        } catch (error) {
-            showError(error.message);
-            targetInput.value = '';
-        }
-    }
+                    if (row.antibiotic) {
+                        const td1 = document.createElement('td');
+                        td1.rowSpan = row.rowspan || 1;
+                        td1.className = "whitespace-nowrap px-4 py-3 font-medium text-gray-900";
+                        td1.innerHTML = `<b>${row.antibiotic}</b>`;
+                        tr.appendChild(td1);
+                        const td2 = document.createElement('td');
+                        td2.rowSpan = row.rowspan || 1;
+                        td2.className = "px-4 py-3";
+                        td2.textContent = row.indication;
+                        tr.appendChild(td2);
+                        const td3 = document.createElement('td');
+                        td3.rowSpan = row.rowspan || 1;
+                        td3.className = "px-4 py-3";
+                        td3.textContent = row.loading;
+                        tr.appendChild(td3);
+                    }
+                    
+                    const td4 = document.createElement('td');
+                    td4.className = "px-4 py-3";
+                    td4.textContent = row.crcl;
+                    tr.appendChild(td4);
+                    const td5 = document.createElement('td');
+                    td5.className = "px-4 py-3";
+                    td5.innerHTML = row.dose;
+                    tr.appendChild(td5);
 
-    // --- New Duration Functions ---
-    function toggleDurationSection() {
-        const section = document.getElementById('durationSection');
-        const btn = document.getElementById('toggleDurationBtn');
-        const isHidden = section.classList.contains('hidden');
-        
-        if (isHidden) {
-            section.classList.remove('hidden');
-            btn.textContent = 'Hide Infusion Duration Calculator';
-        } else {
-            section.classList.add('hidden');
-            btn.textContent = 'Show Infusion Duration Calculator';
-        }
-    }
-
-    function calculateDuration(targetKey) {
-        hideError();
-        for (const key in durationInputs) {
-            durationInputs[key].classList.remove('calculated-field');
-        }
-
-        const totalVolume = parseFloat(durationInputs.totalVolume.value);
-        const dripRate = parseFloat(durationInputs.dripRate.value);
-        const time = parseFloat(durationInputs.time.value);
-        const targetInput = durationInputs[targetKey];
-        let result = NaN;
-
-        try {
-            switch (targetKey) {
-                case 'time':
-                    if (isNaN(totalVolume) || isNaN(dripRate)) { showError("Provide Total Volume and Drip Rate."); return; }
-                    if (dripRate <= 0) { showError("Drip Rate must be positive."); return; }
-                    result = totalVolume / dripRate;
-                    break;
-                case 'dripRate':
-                    if (isNaN(totalVolume) || isNaN(time)) { showError("Provide Total Volume and Time."); return; }
-                    if (time <= 0) { showError("Time must be positive."); return; }
-                    result = totalVolume / time;
-                    break;
-                case 'totalVolume':
-                    if (isNaN(dripRate) || isNaN(time)) { showError("Provide Drip Rate and Time."); return; }
-                    result = dripRate * time;
-                    break;
+                    tbody.appendChild(tr);
+                });
             }
 
-            if (isNaN(result) || !isFinite(result) || result < 0) {
-                showError("Calculation resulted in an invalid number. Check inputs."); return;
+
+            // --- ABG LOGIC ---
+            const abg_getVal = id => parseFloat(document.getElementById(id).value);
+            const abg_showError = msg => {
+                getEl('abgErrorMessageText').textContent = msg;
+                getEl('abgErrorMessage').classList.remove('hidden');
+            };
+            const abg_hideError = () => getEl('abgErrorMessage').classList.add('hidden');
+            const abg_hideResults = () => getEl('abgResultsSection').classList.add('hidden');
+
+            window.analyzeABG = function() {
+                abg_hideError();
+                abg_hideResults();
+                const inputs = {
+                    ph: abg_getVal('ph'), paco2: abg_getVal('paco2'), hco3: abg_getVal('hco3'),
+                    na: abg_getVal('na'), cl: abg_getVal('cl'), albumin: abg_getVal('albumin')
+                };
+                if (isNaN(inputs.ph) || isNaN(inputs.paco2) || isNaN(inputs.hco3)) { abg_showError("Please fill in the required fields (pH, PaCO₂, HCO₃⁻)."); return; }
+
+                let primaryDisorder = 'Undetermined', isMetabolic = false, isRespiratory = false;
+                
+                if (inputs.ph < 7.35) {
+                    if (inputs.hco3 < 22) { primaryDisorder = 'Metabolic Acidosis'; isMetabolic = true; } 
+                    else if (inputs.paco2 > 45) { primaryDisorder = 'Respiratory Acidosis'; isRespiratory = true; } 
+                    else { primaryDisorder = 'Mixed Acidosis'; }
+                } else if (inputs.ph > 7.45) {
+                    if (inputs.hco3 > 26) { primaryDisorder = 'Metabolic Alkalosis'; isMetabolic = true; } 
+                    else if (inputs.paco2 < 35) { primaryDisorder = 'Respiratory Alkalosis'; isRespiratory = true; } 
+                    else { primaryDisorder = 'Mixed Alkalosis'; }
+                } else {
+                    if (inputs.paco2 > 45 && inputs.hco3 > 26) primaryDisorder = 'Compensated Respiratory Acidosis';
+                    else if (inputs.paco2 < 35 && inputs.hco3 < 22) primaryDisorder = 'Compensated Respiratory Alkalosis';
+                    else if (inputs.hco3 < 22 && inputs.paco2 < 35) primaryDisorder = 'Compensated Metabolic Acidosis';
+                    else if (inputs.hco3 > 26 && inputs.paco2 > 45) primaryDisorder = 'Compensated Metabolic Alkalosis';
+                    else primaryDisorder = 'Normal ABG or Mixed Disorder';
+                }
+                
+                getEl('respiratoryTiming').classList.toggle('hidden', !isRespiratory);
+                const resultsSection = getEl('abgResultsSection');
+                getEl('primaryDisorderResult').innerHTML = generatePrimaryDisorderHTML(primaryDisorder);
+                let summary = primaryDisorder + ".";
+                
+                if (primaryDisorder.includes('Metabolic Acidosis')) {
+                    const hasAnionGapData = !isNaN(inputs.na) && !isNaN(inputs.cl) && !isNaN(inputs.albumin);
+                    let ag, comp;
+                    if (hasAnionGapData) {
+                        ag = calculateAnionGap(inputs.na, inputs.cl, inputs.hco3, inputs.albumin);
+                        getEl('anionGapResult').innerHTML = ag.html;
+                        getEl('anionGapResult').classList.remove('hidden');
+                        comp = checkMetabolicAcidosisCompensation(inputs.paco2, inputs.hco3, ag.correctedAG);
+                        summary = `${ag.type} ${primaryDisorder} with ${comp.interpretation}.`;
+                    } else {
+                        getEl('anionGapResult').classList.add('hidden');
+                        comp = checkMetabolicAcidosisCompensation(inputs.paco2, inputs.hco3, NaN);
+                        summary = `${primaryDisorder} with ${comp.interpretation}. (Anion Gap not calculated due to missing values).`;
+                    }
+                    getEl('compensationResult').innerHTML = comp.html;
+                    getEl('compensationResult').classList.remove('hidden');
+                } else if (isRespiratory) {
+                    const timing = querySel('input[name="timing"]:checked');
+                    if (!timing) { abg_showError("Please select 'Acute' or 'Chronic' for the respiratory disorder."); return; }
+                    const comp = checkRespiratoryCompensation(primaryDisorder, inputs.paco2, inputs.hco3, timing.value);
+                    getEl('compensationResult').innerHTML = comp.html;
+                    getEl('compensationResult').classList.remove('hidden');
+                    getEl('anionGapResult').classList.add('hidden');
+                    summary = `${timing.value.charAt(0).toUpperCase() + timing.value.slice(1)} ${primaryDisorder} with ${comp.interpretation}.`;
+                } else {
+                    getEl('anionGapResult').classList.add('hidden');
+                    getEl('compensationResult').classList.add('hidden');
+                }
+                
+                getEl('summaryText').textContent = summary;
+                resultsSection.classList.remove('hidden');
+            }
+            function generatePrimaryDisorderHTML(disorder) { return `<div class="result-card bg-slate-700/50 border-l-cyan-500"><h4>Primary Disorder</h4><p class="text-xl font-bold text-white mt-1">${disorder}</p></div>`; }
+            function calculateAnionGap(na, cl, hco3, albumin) {
+                const ag = na - (cl + hco3);
+                const correctedAG = ag + 2.5 * (4.0 - albumin);
+                const type = correctedAG > 12 ? 'High Anion Gap' : 'Non-Anion Gap';
+                const html = `<div class="result-card"><h4>Anion Gap (AG) Analysis</h4><p class="mt-2">The Anion Gap helps differentiate the cause of a metabolic acidosis.</p><div class="mt-2 space-y-2"><p><strong>Calculated AG:</strong> <span class="text-white font-bold">${ag.toFixed(2)}</span></p><p><strong>Albumin-Corrected AG:</strong> <span class="text-white font-bold">${correctedAG.toFixed(2)}</span></p><p><strong>Interpretation:</strong> <span class="text-white font-bold">${type} Metabolic Acidosis (HAGMA/NAGMA)</span></p></div><div class="formula"><p><strong>Corrected AG = [Na⁺] - ([Cl⁻] + [HCO₃⁻]) + 2.5 * (4.0 - Albumin)</strong></p><p>= ${na} - (${cl} + ${hco3}) + 2.5 * (4.0 - ${albumin}) = ${correctedAG.toFixed(2)}</p></div></div>`;
+                return { html, correctedAG, type };
+            }
+            function checkMetabolicAcidosisCompensation(paco2, hco3, correctedAG) {
+                const expectedPaCO2 = (1.5 * hco3) + 8;
+                const lowerBound = expectedPaCO2 - 2;
+                const upperBound = expectedPaCO2 + 2;
+                let paco2Interpretation = 'appropriate respiratory compensation';
+                if (paco2 > upperBound) paco2Interpretation = 'a concurrent primary respiratory acidosis';
+                if (paco2 < lowerBound) paco2Interpretation = 'a concurrent primary respiratory alkalosis';
+                let deltaGapHTML = '';
+                if (!isNaN(correctedAG) && correctedAG > 12) {
+                    const deltaAG = correctedAG - 12;
+                    const deltaHCO3 = 24 - hco3;
+                    const ratio = deltaHCO3 !== 0 ? deltaAG / deltaHCO3 : 0;
+                    let deltaInterpretation = 'a pure High-Anion Gap Metabolic Acidosis.';
+                    if (ratio < 1) deltaInterpretation = 'a concurrent Non-Anion Gap Metabolic Acidosis.';
+                    if (ratio > 2) deltaInterpretation = 'a concurrent metabolic alkalosis.';
+                    deltaGapHTML = `<h4 class="mt-4">Delta-Delta Gap (ΔΔ Gap)</h4><p class="mt-2">Used in HAGMA to detect underlying mixed metabolic disorders.</p><p class="mt-2"><strong>Ratio (ΔAG/ΔHCO₃⁻):</strong> <span class="text-white font-bold">${ratio.toFixed(2)}</span></p><p><strong>Interpretation:</strong> Suggests ${deltaInterpretation}</p><div class="formula"><p><strong>Ratio = (AG - 12) / (24 - [HCO₃⁻])</strong></p><p>= (${correctedAG.toFixed(2)} - 12) / (24 - ${hco3}) = ${ratio.toFixed(2)}</p></div>`;
+                }
+                const html = `<div class="result-card"><h4>Compensation Analysis</h4><h4 class="mt-2">Winter's Formula (Expected PaCO₂)</h4><p class="mt-2">Calculates the expected respiratory compensation for the metabolic acidosis.</p><p class="mt-2"><strong>Expected PaCO₂ Range:</strong> <span class="text-white font-bold">${lowerBound.toFixed(2)} - ${upperBound.toFixed(2)} mmHg</span></p><p><strong>Patient's PaCO₂:</strong> <span class="text-white font-bold">${paco2} mmHg</span></p><p><strong>Interpretation:</strong> This indicates ${paco2Interpretation}.</p><div class="formula"><p><strong>Expected PaCO₂ = (1.5 * [HCO₃⁻]) + 8 ± 2</strong></p><p>= (1.5 * ${hco3}) + 8 ± 2 = ${expectedPaCO2.toFixed(2)} ± 2</p></div>${deltaGapHTML}</div>`;
+                return { html, interpretation: paco2Interpretation };
+            }
+            function checkRespiratoryCompensation(disorder, paco2, hco3, timing) {
+                let expectedHCO3, formula, interpretation;
+                const deltaPaCO2 = Math.abs(paco2 - 40) / 10;
+                if (disorder.includes('Acidosis')) {
+                    if (timing === 'acute') { expectedHCO3 = 24 + (1 * deltaPaCO2); formula = `Expected [HCO₃⁻] = 24 + 1 * ((${paco2} - 40) / 10)`; } 
+                    else { expectedHCO3 = 24 + (4 * deltaPaCO2); formula = `Expected [HCO₃⁻] = 24 + 4 * ((${paco2} - 40) / 10)`; }
+                } else {
+                    if (timing === 'acute') { expectedHCO3 = 24 - (2 * deltaPaCO2); formula = `Expected [HCO₃⁻] = 24 - 2 * ((40 - ${paco2}) / 10)`; } 
+                    else { expectedHCO3 = 24 - (5 * deltaPaCO2); formula = `Expected [HCO₃⁻] = 24 - 5 * ((40 - ${paco2}) / 10)`; }
+                }
+                if (hco3 > expectedHCO3 + 2) interpretation = 'a concurrent metabolic alkalosis';
+                else if (hco3 < expectedHCO3 - 2) interpretation = 'a concurrent metabolic acidosis';
+                else interpretation = 'appropriate metabolic compensation';
+                const html = `<div class="result-card"><h4>Compensation Analysis (${timing.charAt(0).toUpperCase() + timing.slice(1)})</h4><p class="mt-2">Calculates the expected metabolic compensation for the respiratory disorder.</p><p class="mt-2"><strong>Expected HCO₃⁻:</strong> <span class="text-white font-bold">~${expectedHCO3.toFixed(2)} mEq/L</span></p><p><strong>Patient's HCO₃⁻:</strong> <span class="text-white font-bold">${hco3} mEq/L</span></p><p><strong>Interpretation:</strong> Suggests ${interpretation}.</p><div class="formula"><p><strong>${formula}</strong> = ${expectedHCO3.toFixed(2)}</p></div></div>`;
+                return { html, interpretation };
             }
 
-            targetInput.value = result.toFixed(2);
-            targetInput.classList.add('calculated-field');
 
-            // Sync result back to the main calculator
-            if (targetKey === 'dripRate' || targetKey === 'totalVolume') {
-                infusionInputs[targetKey].value = targetInput.value;
-                if(targetKey === 'totalVolume') handleVolumeChange(infusionInputs.totalVolume);
+            // --- BETA-BLOCKER LOGIC ---
+            const bb_equivalenceRatios = { atenolol: 50, bisoprolol: 5, carvedilol: 25, metoprolol_t: 50, metoprolol_s: 50, nebivolol: 5, propranolol: 40 };
+            const bb_gdmtDrugs = ['bisoprolol', 'carvedilol', 'metoprolol_s'];
+            window.calculateBetaBlockerEquivalence = function() {
+                const selectedDrug = getEl('bb_drug').value;
+                const dose = parseFloat(getEl('bb_dose').value);
+                const resultsSection = getEl('bbResultsSection');
+                const resultsList = getEl('bbResultsList');
+                const errorMessageDiv = getEl('bbErrorMessage');
+                const errorMessageText = getEl('bbErrorMessageText');
+                resultsList.innerHTML = '';
+                errorMessageDiv.classList.add('hidden');
+                resultsSection.classList.add('hidden');
+                if (isNaN(dose) || dose <= 0) {
+                    errorMessageText.textContent = 'Please enter a valid, positive daily dose.';
+                    errorMessageDiv.classList.remove('hidden');
+                    return;
+                }
+                const baseEquivalent = dose / bb_equivalenceRatios[selectedDrug];
+                for (const drug in bb_equivalenceRatios) {
+                    const equivalentDose = baseEquivalent * bb_equivalenceRatios[drug];
+                    const drugName = getBetaBlockerDisplayName(drug);
+                    const isOriginal = drug === selectedDrug;
+                    const isGdmt = bb_gdmtDrugs.includes(drug);
+                    let highlightClass = isOriginal ? 'bg-cyan-900/50 border-cyan-500' : 'bg-slate-700/50 border-slate-600';
+                    const resultEl = document.createElement('div');
+                    resultEl.className = `flex justify-between items-center p-3 rounded-lg border ${highlightClass} transition-all`;
+                    let gdmtBadge = isGdmt ? `<span class="text-xs text-cyan-300 bg-cyan-800/60 px-2 py-0.5 rounded-full ml-2 font-medium">HFrEF Guideline</span>` : '';
+                    resultEl.innerHTML = `<div class="flex items-center"><span class="font-medium text-slate-200">${drugName}</span>${gdmtBadge}</div><span class="font-bold text-lg text-white">${equivalentDose.toFixed(1)} mg/day</span>`;
+                    resultsList.appendChild(resultEl);
+                }
+                resultsSection.classList.remove('hidden');
+            }
+            function getBetaBlockerDisplayName(key) {
+                const names = { atenolol: 'Atenolol', bisoprolol: 'Bisoprolol', carvedilol: 'Carvedilol', metoprolol_t: 'Metoprolol Tartrate', metoprolol_s: 'Metoprolol Succinate (ER)', nebivolol: 'Nebivolol', propranolol: 'Propranolol' };
+                return names[key];
             }
 
-        } catch(e) {
-            showError(e.message);
-        }
-    }
-    // --- END: UNCHANGED JAVASCRIPT LOGIC ---
-</script>
+            
+            // --- CALCIUM ALBUMIN LOGIC ---
+            const ELEMENTAL_CA_IN_GLUCONATE = 9.3;
+            const caErrorMessageDiv = getEl('caErrorMessage');
+            const caErrorMessageText = getEl('caErrorMessageText');
+            function showCaError(message) { caErrorMessageText.textContent = message; caErrorMessageDiv.classList.remove('hidden'); }
+            function hideCaError() { caErrorMessageDiv.classList.add('hidden'); }
 
+            window.calculateCorrectedCalcium = function() {
+                hideCaError();
+                const totalCa = parseFloat(getEl('totalCalcium').value);
+                const albumin = parseFloat(getEl('albumin_ca').value);
+                const resultDiv = getEl('correctedCalciumResult');
+                const resultP = resultDiv.querySelector('p');
+                if (isNaN(totalCa) || isNaN(albumin)) { showCaError("Please enter valid numbers for both Total Calcium and Albumin."); resultDiv.classList.add('hidden'); return; }
+                const correctedCa = totalCa + (0.8 * (4.0 - albumin));
+                resultP.innerHTML = `Corrected Calcium: <span class="font-bold text-white">${correctedCa.toFixed(2)} mg/dL</span>`;
+                resultDiv.classList.remove('hidden');
+            }
+
+            const infusionInputs = { rate: getEl('infusion_rate'), weight: getEl('infusion_weight'), caVolume: getEl('infusion_caVolume'), ivVolume: getEl('infusion_ivVolume'), totalVolume: getEl('infusion_totalVolume'), dripRate: getEl('infusion_dripRate') };
+            const durationInputs = { totalVolume: getEl('duration_totalVolume'), dripRate: getEl('duration_dripRate'), time: getEl('duration_time') };
+
+            ['caVolume', 'ivVolume', 'totalVolume'].forEach(key => infusionInputs[key].addEventListener('input', () => handleVolumeChange(infusionInputs[key])));
+            infusionInputs.totalVolume.addEventListener('input', () => durationInputs.totalVolume.value = infusionInputs.totalVolume.value);
+            infusionInputs.dripRate.addEventListener('input', () => durationInputs.dripRate.value = infusionInputs.dripRate.value);
+            durationInputs.totalVolume.addEventListener('input', () => { infusionInputs.totalVolume.value = durationInputs.totalVolume.value; handleVolumeChange(infusionInputs.totalVolume); });
+            durationInputs.dripRate.addEventListener('input', () => infusionInputs.dripRate.value = durationInputs.dripRate.value);
+
+            function handleVolumeChange(changedElement) {
+                const caVolume = parseFloat(infusionInputs.caVolume.value);
+                const ivVolume = parseFloat(infusionInputs.ivVolume.value);
+                const totalVolume = parseFloat(infusionInputs.totalVolume.value);
+                if (changedElement === infusionInputs.caVolume || changedElement === infusionInputs.ivVolume) {
+                    if (!isNaN(caVolume) && !isNaN(ivVolume)) { const newTotal = caVolume + ivVolume; infusionInputs.totalVolume.value = newTotal > 0 ? newTotal.toFixed(2) : ''; durationInputs.totalVolume.value = infusionInputs.totalVolume.value; }
+                } else if (changedElement === infusionInputs.totalVolume) {
+                    if (!isNaN(totalVolume) && !isNaN(caVolume) && totalVolume >= caVolume) { const newDiluent = totalVolume - caVolume; infusionInputs.ivVolume.value = newDiluent >= 0 ? newDiluent.toFixed(2) : ''; }
+                }
+            }
+
+            window.calculateInfusion = function(targetKey) {
+                hideCaError();
+                let filledValues = {};
+                for (const key in infusionInputs) {
+                    infusionInputs[key].classList.remove('calculated-field');
+                    if (key !== targetKey) { const value = infusionInputs[key].value; filledValues[key] = value === '' ? NaN : parseFloat(value); }
+                }
+                const targetInput = infusionInputs[targetKey];
+                let result = NaN;
+                try {
+                    const { rate, weight, caVolume, ivVolume, dripRate } = filledValues;
+                    let totalVolume = filledValues.totalVolume;
+                    if (isNaN(totalVolume)) { if (!isNaN(caVolume) && !isNaN(ivVolume)) { totalVolume = caVolume + ivVolume; } }
+                    if (targetKey !== 'totalVolume' && isNaN(totalVolume)) { showCaError("Please provide enough volume information (e.g., Ca Gluconate and Diluent)."); return; }
+                    switch (targetKey) {
+                        case 'rate': if (isNaN(weight) || isNaN(dripRate) || isNaN(caVolume)) { showCaError("Provide Weight, Drip Rate, Ca Gluconate, and volume info."); return; } if (weight <= 0 || totalVolume <= 0) { showCaError("Weight and total volume must be positive."); return; }; result = ((caVolume * ELEMENTAL_CA_IN_GLUCONATE) / totalVolume * dripRate) / weight; break;
+                        case 'dripRate': if (isNaN(rate) || isNaN(weight) || isNaN(caVolume)) { showCaError("Provide Rate, Weight, Ca Gluconate, and volume info."); return; } if (weight <= 0 || caVolume <= 0) { showCaError("Weight and Ca Gluconate volume must be positive."); return; }; result = (rate * weight * totalVolume) / (caVolume * ELEMENTAL_CA_IN_GLUCONATE); break;
+                        case 'ivVolume': if (isNaN(rate) || isNaN(weight) || isNaN(dripRate) || isNaN(caVolume)) { showCaError("Provide Rate, Weight, Drip Rate, and Ca Gluconate Volume."); return; } if (rate <= 0 || weight <= 0 || dripRate <= 0) { showCaError("Rate, Weight, and Drip Rate must be positive."); return; }; const requiredTotalVol = (caVolume * ELEMENTAL_CA_IN_GLUCONATE * dripRate) / (rate * weight); result = requiredTotalVol - caVolume; break;
+                        case 'caVolume': if (isNaN(rate) || isNaN(weight) || isNaN(dripRate)) { showCaError("Provide Rate, Weight, Drip Rate, and volume info."); return; } if (rate <= 0 || weight <= 0 || dripRate <= 0) { showCaError("Rate, Weight, and Drip Rate must be positive."); return; }; result = (rate * weight * totalVolume) / (ELEMENTAL_CA_IN_GLUCONATE * dripRate); break;
+                        case 'weight': if (isNaN(rate) || isNaN(dripRate) || isNaN(caVolume)) { showCaError("Provide Rate, Drip Rate, Ca Gluconate, and volume info."); return; } if (rate <= 0 || totalVolume <= 0) { showCaError("Rate and total volume must be positive."); return; }; result = ((caVolume * ELEMENTAL_CA_IN_GLUCONATE) / totalVolume * dripRate) / rate; break;
+                    }
+                    if (isNaN(result) || !isFinite(result) || result < 0) { showCaError("Calculation resulted in an invalid number. Please check your inputs."); return; }
+                    targetInput.value = result.toFixed(2);
+                    targetInput.classList.add('calculated-field');
+                    if (targetKey === 'ivVolume' || targetKey === 'caVolume') { handleVolumeChange(targetInput); }
+                    if (targetKey === 'dripRate') { durationInputs.dripRate.value = targetInput.value; }
+                } catch (error) { showCaError(error.message); targetInput.value = ''; }
+            }
+
+            window.toggleDurationSection = function() {
+                const section = getEl('durationSection');
+                const btn = getEl('toggleDurationBtn');
+                const isHidden = section.classList.contains('hidden');
+                if (isHidden) { section.classList.remove('hidden'); btn.textContent = 'Hide Infusion Duration Calculator'; } 
+                else { section.classList.add('hidden'); btn.textContent = 'Show Infusion Duration Calculator'; }
+            }
+
+            window.calculateDuration = function(targetKey) {
+                hideCaError();
+                for (const key in durationInputs) { durationInputs[key].classList.remove('calculated-field'); }
+                const totalVolume = parseFloat(durationInputs.totalVolume.value);
+                const dripRate = parseFloat(durationInputs.dripRate.value);
+                const time = parseFloat(durationInputs.time.value);
+                const targetInput = durationInputs[targetKey];
+                let result = NaN;
+                try {
+                    switch (targetKey) {
+                        case 'time': if (isNaN(totalVolume) || isNaN(dripRate)) { showCaError("Provide Total Volume and Drip Rate."); return; } if (dripRate <= 0) { showCaError("Drip Rate must be positive."); return; } result = totalVolume / dripRate; break;
+                        case 'dripRate': if (isNaN(totalVolume) || isNaN(time)) { showCaError("Provide Total Volume and Time."); return; } if (time <= 0) { showCaError("Time must be positive."); return; } result = totalVolume / time; break;
+                        case 'totalVolume': if (isNaN(dripRate) || isNaN(time)) { showCaError("Provide Drip Rate and Time."); return; } result = dripRate * time; break;
+                    }
+                    if (isNaN(result) || !isFinite(result) || result < 0) { showCaError("Calculation resulted in an invalid number. Check inputs."); return; }
+                    targetInput.value = result.toFixed(2);
+                    targetInput.classList.add('calculated-field');
+                    if (targetKey === 'dripRate' || targetKey === 'totalVolume') { infusionInputs[targetKey].value = targetInput.value; if(targetKey === 'totalVolume') handleVolumeChange(infusionInputs.totalVolume); }
+                } catch(e) { showCaError(e.message); }
+            }
+
+
+            // --- CALSULIN LOGIC ---
+            let calculatedRegimen = null;
+            let calculatedTDD = null;
+            const allCalsulinInputs = document.querySelectorAll('#calsulin input, #calsulin select');
+            const calsulin_tddMethodInputs = document.querySelectorAll('input[name="tddMethod"]');
+            const calsulin_calculationInputsDiv = getEl('calculationInputs');
+            const calsulin_manualTddInputDiv = getEl('manualTddInput');
+            const calsulin_resultsContent = getEl('calsulin-resultsContent');
+            const calsulin_noSelectionMessage = getEl('noSelectionMessage');
+            const calsulin_scheduleBodyEl = getEl('scheduleBody');
+            const calsulin_calculationTextEl = getEl('calculationText');
+            const calsulin_regimenTypeSelect = getEl('regimenType');
+            const calsulin_basalBolusInputsDiv = getEl('basalBolusInputs');
+            const calsulin_premixedInputsDiv = getEl('premixedInputs');
+            const calsulin_step2FeedingSchedule = document.querySelectorAll('#calsulin-step2 input[name="feedingSchedule"]');
+            const calsulin_validationMessageEl = getEl('validation-message');
+            const calsulin_orderOutput = getEl('orderOutput');
+            const calsulin_copyButton = getEl('copyButton');
+            const calsulin_copyFeedback = getEl('copyFeedback');
+            const calsulin_tddCorrectionInput = getEl('tddCorrection');
+            const calsulin_calculateCorrectionBtn = getEl('calculate-correction-btn');
+            const calsulin_resultsContentCorrection = getEl('results-content-correction');
+            const calsulin_errorMessage = getEl('calsulin-error-message');
+            
+            window.showCalsulinTab = function(tabId) {
+                document.querySelectorAll('#calsulin .tab-content').forEach(el => el.classList.remove('active'));
+                document.querySelectorAll('#calsulin .tab-button').forEach(el => el.classList.remove('active'));
+                getEl('calsulin-' + tabId).classList.add('active');
+                getEl('calsulin-' + tabId + '-btn').classList.add('active');
+            }
+            function roundDose(dose) {
+                if (dose <= 0) return 0;
+                const rounded = Math.round(dose);
+                if (rounded < 4) return 4;
+                return rounded % 2 === 0 ? rounded : rounded + 1;
+            }
+            function validateAndParse(elementId) {
+                const element = getEl(elementId);
+                const value = parseFloat(element.value);
+                if (!element.value || isNaN(value) || value <= 0) { element.classList.add('input-error'); return null; }
+                element.classList.remove('input-error');
+                return value;
+            }
+            function calculateAndDisplay() {
+                const tddMethod = querySel('input[name="tddMethod"]:checked').value;
+                const tddUnit = parseFloat(querySel('input[name="tddUnit"]:checked')?.value);
+                const regimen = querySel('input[name="feedingFrequency"]:checked')?.value;
+                let tdd = 0;
+                const calculationLog = [];
+                if (tddMethod === 'calculate') {
+                    const bodyWeight = validateAndParse('bodyWeight');
+                    if (bodyWeight === null) { showPlaceholder(); return; }
+                    tdd = bodyWeight * tddUnit;
+                    calculationLog.push(`1. TDD Calculation:\n   - TDD = ${bodyWeight}kg * ${tddUnit} U/kg = ${tdd.toFixed(2)} U`);
+                } else {
+                    const manualTdd = validateAndParse('manualTdd');
+                    if (manualTdd === null) { showPlaceholder(); return; }
+                    tdd = manualTdd;
+                    calculationLog.push(`1. Manual TDD Input: ${tdd} U`);
+                }
+                if (!regimen) { showPlaceholder(); return; }
+                hidePlaceholder();
+                let schedule = [], totalBolus = 0, totalBasal = 0;
+                switch (regimen) {
+                    case '3meals': { const rawBolus = tdd * 0.7, rawBasal = tdd * 0.3; const riPerMeal = rawBolus / 3; const riDose = roundDose(riPerMeal); const nphDose = roundDose(rawBasal); totalBolus = riDose * 3; totalBasal = nphDose; calculationLog.push(`2. Split (30/70): Basal=${rawBasal.toFixed(2)}U, Bolus=${rawBolus.toFixed(2)}U`); calculationLog.push(`3. Dosing: RI=${riPerMeal.toFixed(2)}U/meal, NPH=${rawBasal.toFixed(2)}U`); calculationLog.push(`4. Rounded: RI=${riDose}U, NPH=${nphDose}U`); schedule = [{ time: '06:00', type: 'RI (Regular)', dose: riDose }, { time: '12:00', type: 'RI (Regular)', dose: riDose }, { time: '18:00', type: 'RI (Regular)', dose: riDose }, { time: '23:00', type: 'NPH', dose: nphDose }]; calculatedRegimen = { type: 'basalBolus', feeding: '3', basal: nphDose, bolus: riDose, basalType: 'Biosulin N', bolusType: 'RI' }; break; }
+                    case '4meals': { const rawBolus = tdd * 0.5, rawBasal = tdd * 0.5; const riPerMeal = rawBolus / 4, nphPerDose = rawBasal / 2; const riDose = roundDose(riPerMeal); const nphDose = roundDose(nphPerDose); totalBolus = riDose * 4; totalBasal = nphDose * 2; calculationLog.push(`2. Split (50/50): Basal=${rawBasal.toFixed(2)}U, Bolus=${rawBolus.toFixed(2)}U`); calculationLog.push(`3. Dosing: RI=${riPerMeal.toFixed(2)}U/feed, NPH=${nphPerDose.toFixed(2)}U/dose`); calculationLog.push(`4. Rounded: RI=${riDose}U, NPH=${nphDose}U`); schedule = [{ time: '06:00', type: 'RI + NPH', dose: `${riDose} + ${nphDose}` }, { time: '12:00', type: 'RI (Regular)', dose: riDose }, { time: '18:00', type: 'RI + NPH', dose: `${riDose} + ${nphDose}` }, { time: '23:00', type: 'RI (Regular)', dose: riDose }]; calculatedRegimen = { type: 'basalBolus', feeding: '4', basal: nphDose, bolus: riDose, basalType: 'Biosulin N', bolusType: 'RI' }; break; }
+                    case 'premixed': { const rawMorning = (tdd * 2) / 3, rawEvening = tdd / 3; const morningDose = roundDose(rawMorning); const eveningDose = roundDose(rawEvening); const actualTdd = morningDose + eveningDose; totalBolus = Math.round(actualTdd * 0.3); totalBasal = Math.round(actualTdd * 0.7); calculationLog.push(`2. Split (2/3, 1/3): Morning=${rawMorning.toFixed(2)}U, Evening=${rawEvening.toFixed(2)}U`); calculationLog.push(`3. Rounded: Morning=${morningDose}U, Evening=${eveningDose}U`); schedule = [{ time: '06:00', type: 'Premixed (70/30)', dose: morningDose }, { time: '18:00', type: 'Premixed (70/30)', dose: eveningDose }]; calculatedRegimen = { type: 'premixed', morning: morningDose, evening: eveningDose }; break; }
+                }
+                calculatedTDD = Math.round(totalBolus + totalBasal);
+                updateStep1UI(totalBolus, totalBasal, schedule, calculationLog);
+            }
+            window.generateOrder = function() {
+                const orderText = (calsulin_regimenTypeSelect.value === 'basalBolus') ? generateBasalBolusOrder() : generatePremixedOrder();
+                calsulin_validationMessageEl.textContent = '';
+                if (orderText) {
+                    calsulin_orderOutput.textContent = orderText;
+                    calsulin_orderOutput.classList.remove('items-center', 'justify-center', 'text-center', 'text-gray-500');
+                    calsulin_orderOutput.classList.add('text-left');
+                    calsulin_orderOutput.style.color = '#333';
+                    calsulin_copyButton.classList.remove('hidden');
+                    calsulin_copyFeedback.textContent = '';
+                } else { calsulin_validationMessageEl.textContent = 'Please enter valid, positive numbers for all doses.'; }
+            }
+            function getSafeDose(dose) { return Math.max(0, dose); }
+            function generateBasalBolusOrder() {
+                const feeding = querySel('#calsulin-step2 input[name="feedingSchedule"]:checked').value;
+                const basalType = getEl('basalType').value;
+                const bolusType = getEl('bolusType').value;
+                const basalDose = validateAndParse('basalDose');
+                const bolusDose = validateAndParse('bolusDose');
+                if (basalDose === null || bolusDose === null) { return ''; }
+                const isFourFeeds = feeding === '4';
+                const hypoAdj = isFourFeeds ? 2 : 4;
+                const times = isFourFeeds ? '6, 12, 18, 23น' : '6, 12, 18';
+                const bolusDosePlus2 = bolusDose + 2;
+                const bolusDosePlus4 = bolusDose + 4;
+                const bolusDoseMinus = getSafeDose(bolusDose - hypoAdj);
+                const holdText = bolusDoseMinus === 0 ? `Hold ${bolusType}` : `${bolusType} ${bolusDoseMinus} u sc ac at ${times}`;
+                let baseBasalTiming, basalLineBase, basalLinePlus2, basalLinePlus4, basalLineMinus;
+                if (isFourFeeds && basalType === 'Biosulin N') { baseBasalTiming = `sc at 6, 18.00`; } else { baseBasalTiming = `sc at 23.00`; }
+                if (isFourFeeds) { basalLineBase = `${basalType} ${basalDose} u ${baseBasalTiming}`; basalLinePlus2 = basalLineBase; basalLinePlus4 = basalLineBase; basalLineMinus = basalLineBase; } 
+                else { const adjustedBasalMinus = getSafeDose(basalDose - 2); const adjustedBasalPlus2 = basalDose + 2; const adjustedBasalPlus4 = basalDose + 4; basalLineBase = `${basalType} ${basalDose} u ${baseBasalTiming}`; basalLinePlus2 = `${basalType} ${adjustedBasalPlus2} u ${baseBasalTiming}`; basalLinePlus4 = `${basalType} ${adjustedBasalPlus4} u ${baseBasalTiming}`; basalLineMinus = `${basalType} ${adjustedBasalMinus} u ${baseBasalTiming}`; }
+                return `Continue order\n- DTX ac at ${isFourFeeds ? '6, 12, 18, 23น' : '6, 12, 18, and hs'}\n- Off Insulin เดิม\n- ${basalLineBase}\n- ${bolusType} ${bolusDose} u sc ac at ${times}\n\n- If dtx >180:\n  - ${basalLinePlus2}\n  - ${bolusType} ${bolusDosePlus2} u sc ac at ${times}\n- If dtx >250:\n  - ${basalLinePlus4}\n  - ${bolusType} ${bolusDosePlus4} u sc ac at ${times}\n- If dtx <140:\n  - ${basalLineMinus}\n  - ${holdText}\n\n- If dtx <100, >300, ปรับ feed, NPO pls notify Endocrine`;
+            }
+            function generatePremixedOrder() {
+                const insulinType = getEl('premixedType').value;
+                const morning = validateAndParse('premixedMorningDose');
+                const evening = validateAndParse('premixedEveningDose');
+                if (morning === null || evening === null) { return ''; }
+                const base = `${insulinType} ${morning}-0-${evening} u sc ac`;
+                const tierM1 = `${insulinType} ${getSafeDose(morning - 2)}-0-${getSafeDose(evening - 2)} u sc ac`;
+                const tierP1 = `${insulinType} ${morning + 2}-0-${evening + 2} u sc ac`;
+                const tierP2 = `${insulinType} ${morning + 4}-0-${evening + 4} u sc ac`;
+                return `Continue order\n- Off Insulin เดิม\n- DTX ac bid and hs\n- ${base}\n\n- If DTX < 140:\n  - ${tierM1}\n- If DTX > 180:\n  - ${tierP1}\n- If DTX > 250:\n  - ${tierP2}\n\n- If dtx <100, >300, ปรับ feed, NPO pls notify Endocrine`;
+            }
+            window.calculateCorrectionDose = function() {
+                const tdd = parseFloat(calsulin_tddCorrectionInput.value);
+                const currentBg = parseFloat(getEl('current-bg').value);
+                const targetBg = parseFloat(getEl('target-bg').value);
+                const selectedRule = querySel('input[name="isf-rule"]:checked');
+                calsulin_errorMessage.textContent = ''; 
+                if (isNaN(tdd) || tdd <= 0) { calsulin_errorMessage.textContent = 'Please enter a valid Total Daily Dose (TDD).'; return; }
+                if (isNaN(currentBg) || currentBg <= 0) { calsulin_errorMessage.textContent = 'Please enter a valid Current Blood Glucose.'; return; }
+                if (isNaN(targetBg) || targetBg <= 0) { calsulin_errorMessage.textContent = 'Please enter a valid Target Blood Glucose.'; return; }
+                if (!selectedRule) { calsulin_errorMessage.textContent = 'Please select an ISF Rule.'; return; }
+                const isfRuleValue = parseFloat(selectedRule.value);
+                const isf = isfRuleValue / tdd;
+                const glucoseToCorrect = currentBg - targetBg;
+                let correctionDose = 0;
+                if (glucoseToCorrect > 0) { correctionDose = Math.round(glucoseToCorrect / isf); }
+                calsulin_resultsContentCorrection.innerHTML = `<div class="p-3 bg-white rounded-md shadow-sm"><p class="text-sm text-gray-500">1. Insulin Sensitivity Factor (ISF)</p><p class="text-lg font-semibold text-gray-800"><span class="text-blue-600">${isfRuleValue}</span> (Rule) ÷ <span class="text-blue-600">${tdd}</span> (TDD) = <span class="font-bold">${isf.toFixed(2)}</span></p><p class="text-xs text-gray-500 mt-1">1 unit of insulin should lower BG by ~${isf.toFixed(0)} mg/dL.</p></div><div class="p-3 bg-white rounded-md shadow-sm"><p class="text-sm text-gray-500">2. Glucose Deficit</p><p class="text-lg font-semibold text-gray-800"><span class="text-blue-600">${currentBg}</span> (Current) - <span class="text-blue-600">${targetBg}</span> (Target) = <span class="font-bold">${glucoseToCorrect > 0 ? glucoseToCorrect.toFixed(0) : 0} mg/dL</span></p>${glucoseToCorrect <= 0 ? '<p class="text-xs text-green-600 mt-1">Blood glucose is at or below target. No correction needed.</p>' : ''}</div><div class="p-3 bg-white rounded-md shadow-sm"><p class="text-sm text-gray-500">3. Correction Dose Calculation</p><p class="text-lg font-semibold text-gray-800"><span class="text-blue-600">${glucoseToCorrect > 0 ? glucoseToCorrect.toFixed(0) : 0}</span> (Deficit) ÷ <span class="text-blue-600">${isf.toFixed(2)}</span> (ISF) = <span class="font-bold">${(glucoseToCorrect > 0 ? glucoseToCorrect / isf : 0).toFixed(2)}</span></p></div><div class="mt-5 p-4 bg-blue-600 text-white rounded-lg text-center shadow-lg"><p class="text-sm uppercase tracking-wider">Recommended Correction Dose</p><p class="text-4xl font-bold">${correctionDose} units</p></div>`;
+            }
+            window.proceedToStep2 = function() {
+                if (!calculatedRegimen) { const proceedBtn = getEl('proceedButton'); const originalText = proceedBtn.textContent; proceedBtn.textContent = 'Please calculate a dose first!'; proceedBtn.classList.add('bg-red-500', 'hover:bg-red-600'); setTimeout(() => { proceedBtn.textContent = originalText; proceedBtn.classList.remove('bg-red-500', 'hover:bg-red-600'); }, 2500); return; }
+                calsulin_regimenTypeSelect.value = calculatedRegimen.type;
+                updateOrderFormView();
+                if (calculatedRegimen.type === 'basalBolus') { querySel(`#calsulin-step2 input[name="feedingSchedule"][value="${calculatedRegimen.feeding}"]`).checked = true; getEl('basalDose').value = calculatedRegimen.basal; getEl('bolusDose').value = calculatedRegimen.bolus; getEl('basalType').value = calculatedRegimen.basalType; getEl('bolusType').value = calculatedRegimen.bolusType; } 
+                else { getEl('premixedMorningDose').value = calculatedRegimen.morning; getEl('premixedEveningDose').value = calculatedRegimen.evening; }
+                updateStep2Labels();
+                generateOrder();
+                showCalsulinTab('step2');
+            }
+            window.useCalculatedTDD = function() {
+                if (calculatedTDD !== null && calculatedTDD > 0) { calsulin_tddCorrectionInput.value = calculatedTDD; calculateCorrectionDose(); } 
+                else { calsulin_errorMessage.textContent = 'No TDD calculated in Step 1 yet.'; setTimeout(() => { calsulin_errorMessage.textContent = ''; }, 3000); }
+            }
+            function updateStep1UI(totalBolus, totalBasal, schedule, calculationLog) {
+                getEl('tddResult').textContent = `${Math.round(totalBolus + totalBasal)} U`;
+                getEl('bolusResult').textContent = `${Math.round(totalBolus)} U`;
+                getEl('basalResult').textContent = `${Math.round(totalBasal)} U`;
+                calsulin_calculationTextEl.textContent = calculationLog.join('\n\n');
+                calsulin_scheduleBodyEl.innerHTML = schedule.map(item => `<tr class="border-t"><td class="p-3">${item.time}</td><td class="p-3">${item.type}</td><td class="p-3 font-semibold">${item.dose}</td></tr>`).join('');
+            }
+            function showPlaceholder() { calsulin_resultsContent.classList.add('hidden'); calsulin_noSelectionMessage.classList.remove('hidden'); calculatedRegimen = null; calculatedTDD = null; }
+            function hidePlaceholder() { calsulin_resultsContent.classList.remove('hidden'); calsulin_noSelectionMessage.classList.add('hidden'); }
+            function updateOrderFormView() { const isBasalBolus = calsulin_regimenTypeSelect.value === 'basalBolus'; calsulin_basalBolusInputsDiv.classList.toggle('hidden', !isBasalBolus); calsulin_premixedInputsDiv.classList.toggle('hidden', isBasalBolus); }
+            function updateStep2Labels() { const isFourFeeds = querySel('#calsulin-step2 input[name="feedingSchedule"]:checked').value === '4'; getEl('basalDoseLabel').textContent = isFourFeeds ? 'Dose (U) (per injection)' : 'Dose (U)'; }
+            window.copyOrderText = function() {
+                const textToCopy = calsulin_orderOutput.textContent;
+                try {
+                    const textArea = document.createElement("textarea");
+                    textArea.value = textToCopy;
+                    textArea.style.position = "fixed";
+                    textArea.style.top = "-9999px";
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    calsulin_copyFeedback.textContent = 'Order copied to clipboard!';
+                    setTimeout(() => { calsulin_copyFeedback.textContent = ''; }, 3000);
+                } catch (err) { calsulin_copyFeedback.textContent = 'Copy failed.'; setTimeout(() => { calsulin_copyFeedback.textContent = ''; }, 3000); }
+            }
+            allCalsulinInputs.forEach(input => {
+                const eventType = (input.type === 'radio' || input.tagName === 'SELECT') ? 'change' : 'input';
+                input.addEventListener(eventType, () => {
+                    if (input.closest('#calsulin-step1')) { calculateAndDisplay(); } 
+                    else if (input.closest('#calsulin-step2')) { generateOrder(); }
+                });
+            });
+            calsulin_tddMethodInputs.forEach(input => input.addEventListener('change', (e) => {
+                const isCalculate = e.target.value === 'calculate';
+                calsulin_calculationInputsDiv.classList.toggle('hidden', !isCalculate);
+                calsulin_manualTddInputDiv.classList.toggle('hidden', isCalculate);
+                calculateAndDisplay();
+            }));
+            calsulin_regimenTypeSelect.addEventListener('change', updateOrderFormView);
+            calsulin_step2FeedingSchedule.forEach(radio => radio.addEventListener('change', updateStep2Labels));
+            calsulin_calculateCorrectionBtn.addEventListener('click', calculateCorrectionDose);
+
+
+             // --- NUTRITION LOGIC ---
+            const nutritionFields = [ { id: 'ward', default: 'Ward 6ข ขอ consult nutrition ค่า' }, { id: 'name', default: 'นายกิตติกร เกิดกุล' }, { id: 'age', default: '55 yr' }, { id: 'hn', default: '008997-68' }, { id: 'admit', default: '13/05/68' }, { id: 'height', default: '165 cm' }, { id: 'ubw', default: '49 kg (12/67)' }, { id: 'abw', default: '39 kg (12/05/68)' }, { id: 'bmi', default: '' }, { id: 'underlying', default: 'not known u/d (last check-up 2566)' }, { id: 'diagnoses', default: '>> 1st diagnosis : primary CA lung (NSCLC) with Lt main bronchus invade with compress esophagus\n>> obstructive pneumonia at LUL (on tazocin)' }, { id: 'acp', default: '> คุยล่าสุด (ลูกสาว 13/05/68) full med, full CPR ค่ะ' }, { id: 'enteral', default: 'มีปัญหา mass compress esophagus (can’t pass NG)' }, { id: 'npo', default: '- CA lung with compress esophagus (mechanical obstruction) ไม่สามารถ enteral feeding ได้ + can’t pass NG ; NPO ตั้งแต่ 13/05/68-now\n- Consult GI plan set PEG 29/05/68 ***' }, { id: 'allergies', default: '- ไม่มีค่ะ' }, { id: 'volume', default: '- hypovolemia' }, { id: 'io', default: '500/200 (เวรดึกที่ผ่านมา)' }, { id: 'bun_cr', default: '7/0.58' }, { id: 'bun_cr_date', default: '13/05/68' }, { id: 'labs', default: 'lab ล่าสุด elyte phos triglyceride AST ALT และกด compare lab na k phos (ดังรูป)' }, { id: 'cxr', default: 'CXR ล่าสุด (ดังรูป)' }, { id: 'naf', default: 'ประเมิน NAF (ดังแนบค่ะ)' } ];
+            const nutritionContainer = getEl('nutrition-form-container');
+            nutritionFields.forEach(field => {
+                const { id, default: def } = field;
+                const label = document.createElement('label');
+                label.htmlFor = 'nutri_' + id;
+                label.textContent = nutritionLabelText(id);
+                label.className = "block mt-4 font-semibold text-sm";
+                nutritionContainer.appendChild(label);
+                let el;
+                if (def.includes('\n')) {
+                    el = document.createElement('textarea');
+                    el.rows = def.split('\n').length;
+                } else {
+                    el = document.createElement('input');
+                    el.type = 'text';
+                }
+                el.id = 'nutri_' + id;
+                el.value = def;
+                el.className = "w-full p-2 mt-1 border border-gray-300 rounded-md bg-gray-50 text-sm";
+                if (id !== 'bmi') {
+                    el.classList.add('example');
+                    el.addEventListener('focus', function() { if (this.classList.contains('example')) { this.value = ''; this.classList.remove('example'); } });
+                    el.addEventListener('blur', function() { if (this.value.trim() === '') { this.value = def; this.classList.add('example'); } });
+                } else { el.readOnly = true; el.style.backgroundColor = '#e9ecef'; }
+                nutritionContainer.appendChild(el);
+            });
+            function getNumeric(value) { const num = parseFloat(value); return isNaN(num) ? null : num; }
+            function updateBMI() {
+                const heightVal = getNumeric(getEl('nutri_height').value);
+                const abwVal = getNumeric(getEl('nutri_abw').value);
+                const bmiEl = getEl('nutri_bmi');
+                if (heightVal && abwVal) { const bmiValue = abwVal / ((heightVal / 100) ** 2); bmiEl.value = bmiValue.toFixed(2) + ' kg/m2'; } 
+                else { bmiEl.value = ''; }
+            }
+            getEl('nutri_height').addEventListener('input', updateBMI);
+            getEl('nutri_abw').addEventListener('input', updateBMI);
+            function nutritionLabelText(id) {
+                const map = { ward: 'Ward & Consult Request:', name: 'Patient Name:', age: 'Age (yr):', hn: 'HN:', admit: 'Admit Date:', height: 'Height (cm):', ubw: 'UBW (Usual Body Weight):', abw: 'ABW (Actual Body Weight):', bmi: 'BMI (kg/m²):', underlying: 'Underlying Disease:', diagnoses: 'Diagnoses (Nutrition-related):', acp: 'Advance Care Planning (ACP):', enteral: 'Enteral Feed Contraindications:', npo: 'NPO Details:', allergies: 'Food Allergies/Intolerances/Dislikes:', volume: 'Current Volume Status:', io: 'Latest I/O:', bun_cr: 'BUN/Cr:', bun_cr_date: 'Date:', labs: 'Latest Labs:', cxr: 'Latest CXR:', naf: 'NAF Assessment:' };
+                return map[id] || id;
+            }
+            function getNutriValue(id) { return getEl('nutri_' + id).value.trim(); }
+            function generateNutritionNote() {
+                const data = {};
+                nutritionFields.forEach(f => data[f.id] = getNutriValue(f.id));
+                const note = `Ward & Consult Request: ${data.ward}\n\nPatient Name: ${data.name}\nAge: ${data.age}\nHN: ${data.hn}\nAdmit Date: ${data.admit}\n\nBaseline Patient:\n1. Height: ${data.height}\n2. UBW: ${data.ubw}\n3. ABW: ${data.abw}\nBMI: ${data.bmi}\n\nUnderlying Disease:\n${data.underlying}\n\nDiagnoses (Nutrition-related):\n${data.diagnoses}\n\nAdvance Care Planning (ACP):\n${data.acp}\n\nEnteral Feed Contraindications:\n${data.enteral}\n\nNPO Details:\n${data.npo}\n\nFood Allergies/Intolerances/Dislikes:\n${data.allergies}\n\nCurrent Volume Status:\n${data.volume}\n\nLatest I/O:\n${data.io}\n\nBUN/Cr: ${data.bun_cr} (Date: ${data.bun_cr_date})\n\nLatest Labs:\n${data.labs}\n\nLatest CXR:\n${data.cxr}\n\nNAF Assessment:\n${data.naf}`;
+                getEl('nutritionOutput').value = note;
+                copyToClipboard(note);
+            }
+            function saveNutritionFile() {
+                const note = getEl('nutritionOutput').value;
+                if (!note) { return; }
+                const hn = getNutriValue('hn').replace(/\//g, '');
+                const admit = getNutriValue('admit').replace(/\//g, '');
+                const filename = `consult_note_${hn}_${admit}.txt`;
+                const blob = new Blob([note], { type: 'text/plain;charset=utf-8' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+            getEl('nutritionGenerateBtn').addEventListener('click', generateNutritionNote);
+            getEl('nutritionCopyBtn').addEventListener('click', () => copyToClipboard(getEl('nutritionOutput').value));
+            getEl('nutritionSaveBtn').addEventListener('click', saveNutritionFile);
+
+
+            // --- STEROID CONVERTER LOGIC ---
+            const steroid_doseEquivalents = { hydrocortisone: 20, cortisone: 25, prednisone: 5, prednisolone: 5, methylprednisolone: 4, triamcinolone: 4, dexamethasone: 0.75, betamethasone: 0.6 };
+            window.calculateSteroidEquivalence = function() {
+                const selectedDrug = getEl('steroid_drug').value;
+                const dose = parseFloat(getEl('steroid_dose').value);
+                const resultsSection = getEl('steroidResultsSection');
+                const resultsList = getEl('steroidResultsList');
+                const errorMessageDiv = getEl('steroidErrorMessage');
+                const errorMessageText = getEl('steroidErrorMessageText');
+                resultsList.innerHTML = '';
+                errorMessageDiv.classList.add('hidden');
+                resultsSection.classList.add('hidden');
+                if (isNaN(dose) || dose <= 0) { errorMessageText.textContent = 'Please enter a valid, positive dose.'; errorMessageDiv.classList.remove('hidden'); return; }
+                const baseEquivalent = dose / steroid_doseEquivalents[selectedDrug];
+                for (const drug in steroid_doseEquivalents) {
+                    const equivalentDose = baseEquivalent * steroid_doseEquivalents[drug];
+                    const drugName = getSteroidDisplayName(drug);
+                    const isOriginal = drug === selectedDrug;
+                    const highlightClass = isOriginal ? 'bg-cyan-900/50 border-cyan-500' : 'bg-slate-700/50 border-slate-600';
+                    const resultEl = document.createElement('div');
+                    resultEl.className = `flex justify-between items-center p-3 rounded-lg border ${highlightClass} transition-all`;
+                    resultEl.innerHTML = `<span class="font-medium text-slate-200">${drugName}</span><span class="font-bold text-lg text-white">${formatSteroidDose(equivalentDose)} mg</span>`;
+                    resultsList.appendChild(resultEl);
+                }
+                resultsSection.classList.remove('hidden');
+            }
+            function getSteroidDisplayName(key) {
+                const names = { hydrocortisone: 'Hydrocortisone', cortisone: 'Cortisone', prednisone: 'Prednisone', prednisolone: 'Prednisolone', methylprednisolone: 'Methylprednisolone', triamcinolone: 'Triamcinolone', dexamethasone: 'Dexamethasone', betamethasone: 'Betamethasone' };
+                return names[key];
+            }
+            function formatSteroidDose(dose) {
+                if (dose < 1) return dose.toFixed(2);
+                if (dose < 10) return dose.toFixed(1);
+                return dose.toFixed(0);
+            }
+
+
+            // --- GENERAL & INITIALIZATION ---
+            function copyToClipboard(txt) {
+                if(!txt) return;
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(txt).catch(() => fallbackCopy(txt));
+                } else {
+                    fallbackCopy(txt);
+                }
+                showAlert(txt);
+            }
+            function fallbackCopy(txt) {
+                const ta = document.createElement('textarea');
+                ta.value = txt;
+                ta.style.position = 'fixed';
+                ta.style.top = '0';
+                ta.style.left = '-9999px';
+                document.body.appendChild(ta);
+                ta.select();
+                try { document.execCommand('copy'); } catch (err) { console.error('Fallback copy failed', err); }
+                document.body.removeChild(ta);
+            }
+            function showAlert(txt) {
+                const alertEl = getEl('copy-alert');
+                alertEl.innerHTML = `<div class="flex items-center"><i class="ph ph-check-circle text-green-500 mr-3 text-2xl"></i><div>Copied to clipboard:<br><span class="font-semibold text-gray-900">${txt.replace(/\n/g, '<br>')}</span></div></div>`;
+                alertEl.classList.remove('hidden');
+                requestAnimationFrame(() => {
+                    alertEl.classList.remove('opacity-0');
+                    alertEl.style.transform = 'translateY(0)';
+                });
+                setTimeout(() => {
+                    alertEl.classList.add('opacity-0');
+                    alertEl.style.transform = 'translateY(20px)';
+                }, 4000);
+                setTimeout(() => alertEl.classList.add('hidden'), 4500);
+            }
+
+            function initialize() {
+                ['norepi', 'epi', 'dopamine', 'dobutamine'].forEach(id => { let hiddenInput = document.createElement('input'); hiddenInput.type = 'hidden'; hiddenInput.id = id + '-concentration'; getEl(id + '-rate').parentElement.appendChild(hiddenInput); });
+                let fentanylConcInput = document.createElement('input');
+                fentanylConcInput.type = 'hidden';
+                fentanylConcInput.id = 'fentanyl-concentration';
+                fentanylConcInput.value = '10:1';
+                getEl('fentanyl-rate').parentElement.appendChild(fentanylConcInput);
+
+                setupPresetButtons('.norepi-btn-group', 'norepi-concentration');
+                setupPresetButtons('.epi-btn-group', 'epi-concentration');
+                setupPresetButtons('.dopamine-btn-group', 'dopamine-concentration');
+                setupPresetButtons('.dobutamine-btn-group', 'dobutamine-concentration');
+                
+                querySel('.norepi-btn-group [data-ratio="8:100"]')?.click();
+                querySel('.epi-btn-group [data-ratio="1:10"]')?.click();
+                querySel('.dopamine-btn-group [data-ratio="2:1"]')?.click();
+                querySel('.dobutamine-btn-group [data-ratio="2:1"]')?.click();
+                
+                toggleVentFields();
+                populateDoseTiers();
+                populateFullAtbTable();
+                updateBMI();
+                calculateAndDisplay(); 
+                generateOrder(); 
+
+                switchPage('orders', querySel('.nav-link[data-target="orders"]'));
+            }
+
+            initialize();
+        });
+    </script>
 </body>
 </html>
