@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Universal Clinical Guidance Console v4.4 (Fixed)</title>
+    <title>Universal Clinical Guidance Console v5.0 (Live Themes)</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -19,20 +19,20 @@
     <style>
         /* --- THEME VARIABLES --- */
         :root {
-            --transition-speed: 0.4s;
+            --transition-speed: 0.6s;
         }
 
-        /* ANIMATIONS */
-        @keyframes breathe {
-            0% { filter: brightness(1) hue-rotate(0deg) saturate(1); }
-            50% { filter: brightness(1.3) hue-rotate(10deg) saturate(1.4); box-shadow: 0 0 25px rgba(var(--accent-primary-rgb), 0.4); }
-            100% { filter: brightness(1) hue-rotate(0deg) saturate(1); }
+        /* --- ANIMATIONS --- */
+        @keyframes breathe-glow {
+            0% { box-shadow: 0 0 5px rgba(var(--accent-primary-rgb), 0.1); border-color: rgba(var(--accent-primary-rgb), 0.2); }
+            50% { box-shadow: 0 0 15px rgba(var(--accent-primary-rgb), 0.3); border-color: rgba(var(--accent-primary-rgb), 0.5); }
+            100% { box-shadow: 0 0 5px rgba(var(--accent-primary-rgb), 0.1); border-color: rgba(var(--accent-primary-rgb), 0.2); }
         }
 
-        @keyframes pulse-border {
-            0% { border-color: rgba(var(--accent-primary-rgb), 0.3); box-shadow: 0 0 5px rgba(var(--accent-primary-rgb), 0.1); }
-            50% { border-color: rgba(var(--accent-primary-rgb), 0.9); box-shadow: 0 0 20px rgba(var(--accent-primary-rgb), 0.5); }
-            100% { border-color: rgba(var(--accent-primary-rgb), 0.3); box-shadow: 0 0 5px rgba(var(--accent-primary-rgb), 0.1); }
+        @keyframes bg-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         @keyframes float-slow {
@@ -40,17 +40,17 @@
             50% { transform: translate(20px, 30px) rotate(5deg); }
             100% { transform: translate(-10px, -20px) rotate(-5deg); }
         }
-        
-        @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
+
+        @keyframes grid-pan {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 50% 50%; }
         }
 
         /* THEME 1: NEON AURORA */
         [data-theme="neon"] {
-            --bg-body: #09090b;
-            --bg-panel: rgba(24, 24, 27, 0.85);
-            --bg-input: rgba(39, 39, 42, 0.7);
+            --bg-gradient: linear-gradient(125deg, #000000, #0f172a, #0f0518, #022c22);
+            --bg-panel: rgba(20, 20, 25, 0.75);
+            --bg-input: rgba(40, 40, 45, 0.6);
             --border-color: rgba(161, 161, 170, 0.2);
             --text-main: #e4e4e7;
             --text-muted: #a1a1aa;
@@ -58,30 +58,31 @@
             --accent-secondary: #a855f7; /* Purple */
             --accent-primary-rgb: 34, 211, 238;
             --font-head: 'Rajdhani', sans-serif;
-            --aurora-opacity: 0.8;
+            --aurora-opacity: 0.6;
             --grid-opacity: 0.05;
         }
 
         /* THEME 2: OBSIDIAN GRID */
         [data-theme="obsidian"] {
-            --bg-body: #020617;
-            --bg-panel: rgba(15, 23, 42, 0.9);
+            --bg-gradient: linear-gradient(125deg, #020617, #0f172a, #1e1b4b, #020617);
+            --bg-panel: rgba(15, 23, 42, 0.85);
             --bg-input: #1e293b;
             --border-color: #334155;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --accent-primary: #3b82f6; /* Blue */
-            --accent-secondary: #cbd5e1; /* Silver */
+            --accent-secondary: #94a3b8; /* Silver */
             --accent-primary-rgb: 59, 130, 246;
             --font-head: 'Inter', sans-serif;
-            --aurora-opacity: 0.1;
-            --grid-opacity: 0.25;
+            --aurora-opacity: 0.05;
+            --grid-opacity: 0.2;
+            --anim-grid: grid-pan 40s linear infinite;
         }
 
         /* THEME 3: GOLD PEARL */
         [data-theme="pearl"] {
-            --bg-body: #fdf4ff;
-            --bg-panel: rgba(255, 255, 255, 0.95);
+            --bg-gradient: linear-gradient(125deg, #fdf4ff, #fae8ff, #fff7ed, #fdf4ff);
+            --bg-panel: rgba(255, 255, 255, 0.85);
             --bg-input: #ffffff;
             --border-color: #e5e7eb;
             --text-main: #4a044e;
@@ -91,53 +92,57 @@
             --accent-primary-rgb: 217, 70, 239;
             --font-head: 'Sarabun', sans-serif;
             --aurora-opacity: 0.4;
-            --grid-opacity: 0.03;
+            --grid-opacity: 0.02;
         }
 
         /* --- GLOBAL STYLES --- */
         body {
             font-family: 'Inter', 'Sarabun', sans-serif;
-            background-color: var(--bg-body);
+            background: var(--bg-gradient);
+            background-size: 400% 400%;
+            animation: bg-shift 20s ease infinite;
             color: var(--text-main);
-            transition: all var(--transition-speed);
+            transition: color var(--transition-speed);
             overflow: hidden;
         }
 
         h1, h2, h3, h4, h5 { font-family: var(--font-head); }
 
-        /* Background Effects */
+        /* Background Layers */
         .bg-layer { position: fixed; inset: 0; z-index: -1; pointer-events: none; transition: opacity 1s ease; }
         
         .aurora-blob {
-            position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.5;
-            animation: float-slow 20s infinite ease-in-out alternate, breathe 8s infinite ease-in-out;
+            position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.4;
+            animation: float-slow 25s infinite ease-in-out alternate;
         }
-        .blob-1 { top: -20%; left: -20%; width: 70vw; height: 70vw; background: var(--accent-primary); }
-        .blob-2 { bottom: -20%; right: -20%; width: 80vw; height: 80vw; background: var(--accent-secondary); animation-delay: -5s; }
+        .blob-1 { top: -10%; left: -10%; width: 60vw; height: 60vw; background: var(--accent-primary); }
+        .blob-2 { bottom: -10%; right: -10%; width: 70vw; height: 70vw; background: var(--accent-secondary); animation-delay: -10s; }
         
         .grid-bg {
-            background-size: 50px 50px;
+            background-size: 60px 60px;
             background-image: linear-gradient(to right, var(--accent-primary) 1px, transparent 1px),
                               linear-gradient(to bottom, var(--accent-primary) 1px, transparent 1px);
             opacity: var(--grid-opacity);
-            transform: perspective(800px) rotateX(15deg) scale(1.5);
+            transform: perspective(1000px) rotateX(20deg) scale(1.5);
             transform-origin: top center;
-            animation: breathe 15s infinite ease-in-out;
+            animation: var(--anim-grid, none);
         }
 
         /* --- COMPONENT STYLES --- */
         .glass-panel {
             background: var(--bg-panel);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--border-color);
             border-radius: 1rem;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-            transition: border-color 0.3s, box-shadow 0.3s;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            /* Subtle breathing effect on panels */
+            animation: breathe-glow 8s infinite ease-in-out;
         }
         .glass-panel:hover {
-            border-color: rgba(var(--accent-primary-rgb), 0.4);
-            box-shadow: 0 0 20px rgba(var(--accent-primary-rgb), 0.15);
+            border-color: rgba(var(--accent-primary-rgb), 0.5);
+            box-shadow: 0 8px 32px rgba(var(--accent-primary-rgb), 0.15);
         }
 
         .input-tech {
@@ -147,33 +152,30 @@
             border-radius: 0.5rem;
             padding: 0.6rem 0.8rem;
             width: 100%;
-            transition: all 0.2s;
+            transition: all 0.3s;
         }
         .input-tech:focus {
             outline: none;
-            animation: pulse-border 2s infinite;
             border-color: var(--accent-primary);
+            box-shadow: 0 0 15px rgba(var(--accent-primary-rgb), 0.3);
+            transform: scale(1.01);
         }
-        .input-tech.smart-active {
-            color: var(--text-muted);
-            font-style: italic;
-        }
+        .input-tech.smart-active { color: var(--text-muted); font-style: italic; opacity: 0.8; }
 
         .btn-tech {
             background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            background-size: 200% 200%;
+            animation: bg-shift 5s ease infinite;
             color: white;
             font-weight: 600;
             padding: 0.5rem 1rem;
             border-radius: 0.5rem;
             transition: all 0.3s;
-            box-shadow: 0 0 10px rgba(var(--accent-primary-rgb), 0.3);
-            position: relative;
-            overflow: hidden;
-            animation: breathe 4s infinite ease-in-out;
+            box-shadow: 0 4px 15px rgba(var(--accent-primary-rgb), 0.4);
         }
         .btn-tech:hover {
-            box-shadow: 0 0 20px rgba(var(--accent-primary-rgb), 0.6);
-            transform: translateY(-1px) scale(1.02);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(var(--accent-primary-rgb), 0.6);
         }
         .btn-tech-outline {
             background: transparent;
@@ -184,7 +186,7 @@
             border-radius: 0.5rem;
             transition: all 0.2s;
         }
-        .btn-tech-outline:hover { background: rgba(var(--accent-primary-rgb), 0.1); }
+        .btn-tech-outline:hover { background: rgba(var(--accent-primary-rgb), 0.15); transform: translateY(-1px); }
         
         .nav-item {
             display: flex; align-items: center; padding: 0.75rem 1rem;
@@ -192,28 +194,31 @@
             transition: all 0.2s; cursor: pointer;
         }
         .nav-item:hover, .nav-item.active {
-            background: rgba(var(--accent-primary-rgb), 0.1);
+            background: rgba(var(--accent-primary-rgb), 0.15);
             color: var(--accent-primary);
             border-left: 3px solid var(--accent-primary);
+            padding-left: 1.2rem; /* Slight movement on hover */
         }
 
-        /* Custom Radio Label Selected State */
+        /* Highlight for selected Radio Labels */
+        .radio-label { transition: all 0.3s; }
         .radio-label.selected {
             background-color: rgba(var(--accent-primary-rgb), 0.2);
             border-color: var(--accent-primary);
             color: var(--text-main);
-            box-shadow: 0 0 10px rgba(var(--accent-primary-rgb), 0.3);
+            box-shadow: 0 0 15px rgba(var(--accent-primary-rgb), 0.25);
+            transform: scale(1.02);
         }
 
-        /* Table Styles */
+        /* Tables */
         .tech-table th { padding: 0.75rem; text-align: left; color: var(--accent-primary); border-bottom: 1px solid var(--border-color); font-size: 0.8rem; }
         .tech-table td { padding: 0.75rem; border-bottom: 1px solid var(--border-color); color: var(--text-main); vertical-align: top; font-size: 0.85rem; }
-        .tech-table tr:hover { background-color: rgba(var(--accent-primary-rgb), 0.05); }
+        .tech-table tr:hover { background-color: rgba(var(--accent-primary-rgb), 0.08); }
 
-        /* ABG Formula Specific */
+        /* ABG Formula */
         .result-card { background-color: var(--bg-input); border-left: 4px solid var(--accent-primary); padding: 1rem; border-radius: 0.5rem; margin-top: 1rem; }
         .result-card h4 { color: var(--accent-primary); font-weight: 600; }
-        .formula { font-family: monospace; background-color: rgba(0,0,0,0.2); padding: 0.5rem; border-radius: 0.25rem; color: var(--text-main); font-size: 0.8rem; margin-top: 0.5rem; white-space: pre-wrap; }
+        .formula { font-family: monospace; background-color: rgba(0,0,0,0.1); padding: 0.5rem; border-radius: 0.25rem; color: var(--text-main); font-size: 0.8rem; margin-top: 0.5rem; white-space: pre-wrap; border: 1px dashed var(--border-color); }
 
         /* Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -221,14 +226,14 @@
         ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
-        /* Toast - Enhanced Readability & Positioning */
+        /* Toast */
         #copy-alert {
             position: fixed; bottom: 20px; right: 20px; z-index: 10000; 
             background: var(--bg-panel); 
             border: 1px solid var(--accent-primary);
             color: var(--text-main);
             padding: 1.5rem; border-radius: 0.75rem;
-            box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
             display: flex; flex-direction: column; gap: 0.5rem;
             max-width: 80vw; width: auto; min-width: 300px;
             transform: translateY(150%); opacity: 0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -236,7 +241,7 @@
             word-break: break-word; white-space: pre-wrap;
         }
         #copy-alert.show { transform: translateY(0); opacity: 1; }
-        .fade-in { animation: fadeIn 0.4s ease-in-out; }
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
@@ -253,10 +258,10 @@
     <aside id="sidebar" class="w-64 glass-panel flex flex-col m-2 h-[calc(100vh-1rem)] transform transition-transform duration-300 -translate-x-full md:translate-x-0 absolute md:relative z-30">
         <div class="p-6 border-b border-[var(--border-color)] flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <i class="ph-fill ph-asterisk-simple text-3xl" style="color: var(--accent-primary)"></i>
+                <i class="ph-fill ph-asterisk-simple text-3xl" style="color: var(--accent-primary); animation: breathe-glow 4s infinite;"></i>
                 <div>
                     <h1 class="text-xl font-bold leading-none tracking-wider">MED-OS</h1>
-                    <span class="text-[10px] text-[var(--text-muted)] tracking-widest uppercase">Clinical V.4.4</span>
+                    <span class="text-[10px] text-[var(--text-muted)] tracking-widest uppercase">Clinical V.5.0</span>
                 </div>
             </div>
             <button id="close-sidebar" class="md:hidden text-[var(--text-muted)]"><i class="ph ph-x text-2xl"></i></button>
@@ -287,7 +292,7 @@
         <header class="glass-panel m-2 mb-0 p-4 flex justify-between items-center relative z-50">
             <div class="flex items-center gap-4">
                 <button id="sidebar-toggle" class="md:hidden text-[var(--text-main)]"><i class="ph ph-list text-2xl"></i></button>
-                <h2 id="page-title" class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)]">ICU Orders</h2>
+                <h2 id="page-title" class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] animate-[bg-shift_5s_infinite]">ICU Orders</h2>
             </div>
             
             <div class="flex items-center gap-4">
@@ -295,7 +300,7 @@
                     <button class="btn-tech-outline flex items-center gap-2 text-xs">
                         <i class="ph ph-paint-brush-broad"></i> Theme
                     </button>
-                    <!-- Theme Dropdown: Increased Z-index to 100 -->
+                    <!-- Theme Dropdown -->
                     <div class="absolute right-0 mt-2 w-56 glass-panel shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform origin-top-right z-[100]">
                         <div class="p-2 space-y-1">
                             <button onclick="setTheme('neon')" class="w-full text-left px-3 py-2 rounded text-sm hover:bg-[var(--accent-primary)] hover:text-black transition-colors flex items-center"><span class="w-3 h-3 rounded-full bg-cyan-400 mr-2 shadow-[0_0_10px_cyan]"></span> Neon Aurora</button>
@@ -319,25 +324,25 @@
                     <h3 class="text-lg font-bold border-b border-[var(--border-color)] pb-2 text-[var(--accent-secondary)]">Sedation & Analgesia</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
                         <!-- Cards -->
-                        <div class="glass-panel p-4 flex flex-col gap-3 hover:border-[var(--accent-primary)] transition-colors group">
+                        <div class="glass-panel p-4 flex flex-col gap-3 group">
                             <div class="flex justify-between items-start"><h5 class="font-bold group-hover:text-[var(--accent-primary)] transition-colors">Midazolam</h5><i class="ph ph-moon-stars text-[var(--accent-secondary)]"></i></div>
                             <div><label class="text-xs text-[var(--text-muted)]">Conc (ratio)</label><input id="midazolam-concentration" class="input-tech" value="2:1" /></div>
                             <div><label class="text-xs text-[var(--text-muted)]">Rate (mL/hr)</label><input id="midazolam-rate" class="input-tech" value="5" /></div>
                             <button class="btn-tech mt-auto copy-btn w-full flex justify-center items-center gap-2" data-id="midazolam"><i class="ph ph-copy"></i> Copy Order</button>
                         </div>
-                        <div class="glass-panel p-4 flex flex-col gap-3 hover:border-[var(--accent-primary)] transition-colors group">
+                        <div class="glass-panel p-4 flex flex-col gap-3 group">
                             <div class="flex justify-between items-start"><h5 class="font-bold group-hover:text-[var(--accent-primary)] transition-colors">1% Propofol</h5><i class="ph ph-drop text-[var(--accent-secondary)]"></i></div>
                             <div><label class="text-xs text-[var(--text-muted)]">Conc (ratio)</label><input id="propofol-concentration" class="input-tech" value="10:1" /></div>
                             <div><label class="text-xs text-[var(--text-muted)]">Rate (mL/hr)</label><input id="propofol-rate" class="input-tech" value="5" /></div>
                             <button class="btn-tech mt-auto copy-btn w-full flex justify-center items-center gap-2" data-id="propofol"><i class="ph ph-copy"></i> Copy Order</button>
                         </div>
-                        <div class="glass-panel p-4 flex flex-col gap-3 hover:border-[var(--accent-primary)] transition-colors group">
+                        <div class="glass-panel p-4 flex flex-col gap-3 group">
                             <div class="flex justify-between items-start"><h5 class="font-bold group-hover:text-[var(--accent-primary)] transition-colors">Dexmedetomidine</h5><i class="ph ph-brain text-[var(--accent-secondary)]"></i></div>
                             <div><label class="text-xs text-[var(--text-muted)]">Conc (ratio)</label><input id="dexmed-concentration" class="input-tech" value="4:1" /></div>
                             <div><label class="text-xs text-[var(--text-muted)]">Rate (mL/hr)</label><input id="dexmed-rate" class="input-tech" value="10" /></div>
                             <button class="btn-tech mt-auto copy-btn w-full flex justify-center items-center gap-2" data-id="dexmed"><i class="ph ph-copy"></i> Copy Order</button>
                         </div>
-                         <div class="glass-panel p-4 flex flex-col gap-3 hover:border-[var(--accent-primary)] transition-colors group">
+                         <div class="glass-panel p-4 flex flex-col gap-3 group">
                             <div class="flex justify-between items-start"><h5 class="font-bold group-hover:text-[var(--accent-primary)] transition-colors">Fentanyl</h5><i class="ph ph-bandaids text-[var(--accent-secondary)]"></i></div>
                             <div><label class="text-xs text-[var(--text-muted)]">Conc (ratio)</label><input class="input-tech opacity-50" value="10:1" disabled /></div>
                             <div><label class="text-xs text-[var(--text-muted)]">Rate (mL/hr)</label><input id="fentanyl-rate" class="input-tech" value="5" /></div>
@@ -487,7 +492,7 @@
             <div id="abg" class="content-page hidden fade-in max-w-4xl mx-auto">
                 <div class="glass-panel p-8 space-y-6">
                     <div class="text-center">
-                        <i class="ph ph-lungs text-4xl text-[var(--accent-primary)] animate-pulse"></i>
+                        <i class="ph ph-lungs text-4xl text-[var(--accent-primary)] animate-[breathe-glow_4s_infinite]"></i>
                         <h2 class="text-3xl font-bold mt-2">ABG Analysis Calculator</h2>
                         <p class="text-[var(--text-muted)] mt-1 text-sm">Comprehensive Acid-Base Evaluation</p>
                     </div>
@@ -498,7 +503,7 @@
 
                     <h2 class="text-lg font-semibold text-[var(--accent-secondary)] border-b border-[var(--border-color)] pb-2">Patient Data</h2>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
-                        <div><label class="text-xs text-[var(--text-muted)] font-bold">pH *</label><input id="ph" type="number" step="0.01" class="input-tech" placeholder="e.g. 7.25"></div>
+                        <div><label class="text-xs text-[var(--text-muted)] font-bold">pH *</label><input id="ph" type="number" step="0.01" class="input-tech text-lg" placeholder="e.g. 7.25"></div>
                         <div><label class="text-xs text-[var(--text-muted)] font-bold">PaCO₂ (mmHg) *</label><input id="paco2" type="number" class="input-tech text-lg" placeholder="e.g. 25"></div>
                         <div><label class="text-xs text-[var(--text-muted)] font-bold">HCO₃⁻ (mEq/L) *</label><input id="hco3" type="number" class="input-tech text-lg" placeholder="e.g. 12"></div>
                         <div><label class="text-xs text-[var(--text-muted)]">Na⁺ (Optional)</label><input id="na" type="number" class="input-tech" placeholder="e.g. 140"></div>
@@ -1518,16 +1523,25 @@
         function syncWeights(value, sourceId) {
             weightInputIds.forEach(id => {
                 const el = document.getElementById(id);
-                if (el && el.id !== sourceId && el.value !== value) {
-                    el.value = value;
-                    el.dispatchEvent(new Event('input'));
-                    el.dispatchEvent(new Event('change'));
+                // Only update if element exists and is NOT the source (to avoid cursor jumping)
+                if (el && el.id !== sourceId) {
+                    // Only update if value is actually different to avoid loops
+                    if (el.value !== value) {
+                        el.value = value;
+                        // Trigger change events so connected calculators update automatically
+                        el.dispatchEvent(new Event('input'));
+                        el.dispatchEvent(new Event('change'));
+                    }
                 }
             });
         }
+
+        // Attach listeners
         weightInputIds.forEach(id => {
             const el = document.getElementById(id);
-            if(el) el.addEventListener('input', (e) => syncWeights(e.target.value, e.target.id));
+            if(el) {
+                el.addEventListener('input', (e) => syncWeights(e.target.value, e.target.id));
+            }
         });
 
         // --- INSULIN CORRECTION LOGIC (FIXED) ---
